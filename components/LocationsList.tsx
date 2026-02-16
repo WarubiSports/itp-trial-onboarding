@@ -5,10 +5,7 @@ const categoryOrder: LocationCategory[] = [
   "housing",
   "training",
   "gym",
-  "language_school",
   "dining",
-  "physio",
-  "train_station",
   "leisure",
 ];
 

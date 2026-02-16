@@ -10,6 +10,7 @@ export type TrialProspect = {
   current_club?: string;
   trial_start_date?: string;
   trial_end_date?: string;
+  travel_arrangements?: string;
   status: string;
   created_at: string;
 };
@@ -30,10 +31,7 @@ export type LocationCategory =
   | "housing"
   | "training"
   | "gym"
-  | "language_school"
   | "dining"
-  | "physio"
-  | "train_station"
   | "leisure";
 
 export type ITPLocation = {

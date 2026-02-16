@@ -37,6 +37,7 @@ export default async function PlayerPage({ params }: Props) {
       .select("*")
       .gte("date", startDate)
       .lte("date", endDate)
+      .not("type", "in", "(language_class,recovery)")
       .order("date")
       .order("start_time");
     events = (data || []) as CalendarEvent[];
@@ -53,6 +54,21 @@ export default async function PlayerPage({ params }: Props) {
   return (
     <main className="mx-auto min-h-screen max-w-lg pb-safe">
       <WelcomeHeader prospect={player} />
+      {player.travel_arrangements && (
+        <section className="px-4 pb-6">
+          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
+            <span className="mt-0.5 text-lg">🚐</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                Pick-up
+              </p>
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                {player.travel_arrangements}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
       <WeeklyCalendar
         events={events}
         startDate={startDate || ""}

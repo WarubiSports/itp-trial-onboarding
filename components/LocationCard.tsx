@@ -1,10 +1,7 @@
 import {
   Home,
   Dumbbell,
-  GraduationCap,
   Utensils,
-  HeartPulse,
-  TrainFront,
   TreePine,
   MapPin,
   ExternalLink,
@@ -18,10 +15,7 @@ const categoryConfig: Record<
   housing: { label: "Housing", icon: Home },
   training: { label: "Training Facility", icon: MapPin },
   gym: { label: "Gym", icon: Dumbbell },
-  language_school: { label: "Language School", icon: GraduationCap },
   dining: { label: "Dining", icon: Utensils },
-  physio: { label: "Physio", icon: HeartPulse },
-  train_station: { label: "Train Station", icon: TrainFront },
   leisure: { label: "Leisure", icon: TreePine },
 };
 
