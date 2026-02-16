@@ -1,43 +1,43 @@
--- ITP Trial Onboarding tables
--- Run this in Supabase SQL Editor
+-- Refactored ITP Trial Onboarding
+-- Drops standalone tables, creates shared itp_locations table
+-- Uses existing trial_prospects + calendar_events tables
 
--- Players table
-CREATE TABLE IF NOT EXISTS onboarding_players (
+-- Drop old standalone tables
+DROP TABLE IF EXISTS onboarding_schedule_entries;
+DROP TABLE IF EXISTS onboarding_locations;
+DROP TABLE IF EXISTS onboarding_players;
+
+-- Shared locations per ITP site (not per player)
+CREATE TABLE IF NOT EXISTS itp_locations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  itp_site text NOT NULL,
+  category text NOT NULL CHECK (category IN (
+    'housing', 'training', 'gym', 'language_school',
+    'dining', 'physio', 'train_station', 'leisure'
+  )),
   name text NOT NULL,
-  itp_location text NOT NULL,
-  season text NOT NULL,
+  address text NOT NULL,
+  maps_url text,
   created_at timestamptz DEFAULT now()
 );
 
--- Locations table
-CREATE TABLE IF NOT EXISTS onboarding_locations (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid NOT NULL REFERENCES onboarding_players(id) ON DELETE CASCADE,
-  category text NOT NULL,
-  name text NOT NULL,
-  address text NOT NULL,
-  maps_url text
-);
+-- RLS: public read
+ALTER TABLE itp_locations ENABLE ROW LEVEL SECURITY;
 
--- Schedule entries table
-CREATE TABLE IF NOT EXISTS onboarding_schedule_entries (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid NOT NULL REFERENCES onboarding_players(id) ON DELETE CASCADE,
-  title text NOT NULL,
-  day_of_week int NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
-  start_time time NOT NULL,
-  end_time time NOT NULL,
-  location_category text,
-  color text
-);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public read itp_locations') THEN
+    CREATE POLICY "Public read itp_locations" ON itp_locations FOR SELECT USING (true);
+  END IF;
+END $$;
 
--- Enable RLS
-ALTER TABLE onboarding_players ENABLE ROW LEVEL SECURITY;
-ALTER TABLE onboarding_locations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE onboarding_schedule_entries ENABLE ROW LEVEL SECURITY;
-
--- Public read-only access (no auth required)
-CREATE POLICY "Public read onboarding_players" ON onboarding_players FOR SELECT USING (true);
-CREATE POLICY "Public read onboarding_locations" ON onboarding_locations FOR SELECT USING (true);
-CREATE POLICY "Public read onboarding_schedule_entries" ON onboarding_schedule_entries FOR SELECT USING (true);
+-- Seed Köln locations
+INSERT INTO itp_locations (itp_site, category, name, address, maps_url) VALUES
+  ('Köln', 'housing', 'TBD', 'To be confirmed', NULL),
+  ('Köln', 'training', 'Kunstrasenplätze Salzburger Weg', 'Salzburger Weg, 50858 Köln-Junkersdorf', 'https://maps.google.com/?q=Salzburger+Weg+50858+Köln'),
+  ('Köln', 'gym', 'BluePIT Lövenich', 'Dieselstraße 6, 50859 Köln', 'https://maps.google.com/?q=Dieselstraße+6+50859+Köln'),
+  ('Köln', 'language_school', '1. FC Köln Sportinternat', 'Olympiaweg 3, 50933 Köln', 'https://maps.google.com/?q=Olympiaweg+3+50933+Köln'),
+  ('Köln', 'dining', 'Spoho Mensa', 'Am Sportpark Müngersdorf 6, 50933 Köln', 'https://maps.google.com/?q=Am+Sportpark+Müngersdorf+6+50933+Köln'),
+  ('Köln', 'physio', 'ALC Physiolab', 'Goltsteinstrasse 87a, 50968 Köln', 'https://maps.google.com/?q=Goltsteinstrasse+87a+50968+Köln'),
+  ('Köln', 'train_station', 'TBD', 'To be confirmed', NULL),
+  ('Köln', 'leisure', 'Kölner Dom', 'Domkloster 4, 50667 Köln', 'https://maps.google.com/?q=Domkloster+4+50667+Köln')
+ON CONFLICT DO NOTHING;

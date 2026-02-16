@@ -1,38 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import type { ScheduleEntry, Location } from "@/lib/types";
+import type { CalendarEvent } from "@/lib/types";
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const HOUR_HEIGHT = 56;
 const START_HOUR = 6;
 const END_HOUR = 22;
-const HOUR_HEIGHT = 56; // px per hour
 const TOTAL_HOURS = END_HOUR - START_HOUR;
 
-const defaultColors: Record<string, string> = {
-  Training: "#22c55e",
-  Gym: "#3b82f6",
-  "German Class": "#f97316",
-  Lunch: "#9ca3af",
-  "Match Day": "#ED1C24",
-  Physio: "#ef4444",
-  "Free Time": "#e5e7eb",
+// Map calendar_events.type to display colors
+const typeColors: Record<string, string> = {
+  team_training: "#22c55e",
+  individual_training: "#16a34a",
+  training: "#22c55e",
+  trial: "#22c55e",
+  prospect_trial: "#22c55e",
+  gym: "#3b82f6",
+  recovery: "#8b5cf6",
+  match: "#ED1C24",
+  tournament: "#ED1C24",
+  language_class: "#f97316",
+  school: "#f97316",
+  video_session: "#6366f1",
+  medical: "#ef4444",
+  meeting: "#64748b",
+  airport_pickup: "#06b6d4",
+  team_activity: "#a78bfa",
+  other: "#9ca3af",
+  visa: "#64748b",
 };
 
-const getColor = (entry: ScheduleEntry): string => {
-  if (entry.color) return entry.color;
-  return defaultColors[entry.title] || "#a78bfa";
-};
-
-const timeToMinutes = (time: string): number => {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-};
-
-const formatTime = (time: string): string => {
-  const [h, m] = time.split(":");
-  return `${h}:${m}`;
-};
+const getColor = (type: string): string => typeColors[type] || "#9ca3af";
 
 const isLightColor = (hex: string): boolean => {
   const c = hex.replace("#", "");
@@ -42,44 +40,113 @@ const isLightColor = (hex: string): boolean => {
   return (r * 299 + g * 587 + b * 114) / 1000 > 150;
 };
 
-const getCurrentDayIndex = (): number => {
-  const jsDay = new Date().getDay(); // 0=Sun, 1=Mon...
-  return jsDay === 0 ? 6 : jsDay - 1; // Convert to 0=Mon, 6=Sun
+const parseTime = (time?: string): number | null => {
+  if (!time) return null;
+  // Handle ISO timestamps (2026-03-02T09:00:00+01:00) and plain "HH:MM"
+  if (time.includes("T")) {
+    const d = new Date(time);
+    // Extract hours/minutes in Europe/Berlin timezone
+    const parts = d.toLocaleTimeString("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit", hour12: false }).split(":");
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  }
+  const parts = time.split(":");
+  if (parts.length < 2) return null;
+  return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+};
+
+const formatTime = (time?: string): string => {
+  if (!time) return "";
+  if (time.includes("T")) {
+    const d = new Date(time);
+    return d.toLocaleTimeString("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit", hour12: false });
+  }
+  const parts = time.split(":");
+  return `${parts[0]}:${parts[1]}`;
+};
+
+const formatDayHeader = (dateStr: string): { day: string; date: string } => {
+  const d = new Date(dateStr + "T00:00:00");
+  return {
+    day: d.toLocaleDateString("en-US", { weekday: "short" }),
+    date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  };
+};
+
+// Get all dates between start and end (inclusive)
+const getDateRange = (start: string, end: string): string[] => {
+  const dates: string[] = [];
+  const current = new Date(start + "T00:00:00");
+  const last = new Date(end + "T00:00:00");
+  while (current <= last) {
+    dates.push(current.toISOString().split("T")[0]);
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+};
+
+const isToday = (dateStr: string): boolean => {
+  const today = new Date().toISOString().split("T")[0];
+  return dateStr === today;
 };
 
 export const WeeklyCalendar = ({
-  entries,
-  locations,
+  events,
+  startDate,
+  endDate,
 }: {
-  entries: ScheduleEntry[];
-  locations: Location[];
+  events: CalendarEvent[];
+  startDate: string;
+  endDate: string;
 }) => {
-  const [selected, setSelected] = useState<ScheduleEntry | null>(null);
-  const today = getCurrentDayIndex();
+  const [selected, setSelected] = useState<CalendarEvent | null>(null);
 
-  const locationMap = new Map(locations.map((l) => [l.category, l]));
+  if (!startDate || !endDate) {
+    return (
+      <section className="px-4 pb-8">
+        <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+          Your Schedule
+        </h2>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Trial dates not yet confirmed.
+        </p>
+      </section>
+    );
+  }
+
+  const dates = getDateRange(startDate, endDate);
+
+  // Group events by date
+  const eventsByDate = new Map<string, CalendarEvent[]>();
+  for (const event of events) {
+    const existing = eventsByDate.get(event.date) || [];
+    existing.push(event);
+    eventsByDate.set(event.date, existing);
+  }
 
   return (
     <section className="px-4 pb-8">
       <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-50">
-        Your Week
+        Your Schedule
       </h2>
 
       {/* Day headers */}
       <div className="flex">
         <div className="w-10 shrink-0" />
-        {DAYS.map((day, i) => (
-          <div
-            key={day}
-            className={`flex-1 pb-2 text-center text-xs font-semibold ${
-              i === today
-                ? "text-[#ED1C24]"
-                : "text-zinc-500 dark:text-zinc-400"
-            }`}
-          >
-            {day}
-          </div>
-        ))}
+        {dates.map((dateStr) => {
+          const { day, date } = formatDayHeader(dateStr);
+          const today = isToday(dateStr);
+          return (
+            <div
+              key={dateStr}
+              className={`flex-1 pb-2 text-center ${
+                today ? "text-[#ED1C24]" : "text-zinc-500 dark:text-zinc-400"
+              }`}
+            >
+              <div className="text-xs font-semibold">{day}</div>
+              <div className="text-[10px]">{date}</div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Calendar grid */}
@@ -102,65 +169,71 @@ export const WeeklyCalendar = ({
           </div>
 
           {/* Day columns */}
-          {DAYS.map((_, dayIndex) => (
-            <div
-              key={dayIndex}
-              className={`relative flex-1 border-r border-zinc-100 last:border-r-0 dark:border-zinc-700 ${
-                dayIndex === today ? "bg-red-50/40 dark:bg-red-950/10" : ""
-              }`}
-            >
-              {/* Hour lines */}
-              {Array.from({ length: TOTAL_HOURS }, (_, i) => (
-                <div
-                  key={i}
-                  className="absolute left-0 w-full border-t border-zinc-50 dark:border-zinc-750"
-                  style={{ top: i * HOUR_HEIGHT }}
-                />
-              ))}
+          {dates.map((dateStr) => {
+            const dayEvents = eventsByDate.get(dateStr) || [];
+            const today = isToday(dateStr);
 
-              {/* Schedule blocks */}
-              {entries
-                .filter((e) => e.day_of_week === dayIndex)
-                .map((entry) => {
-                  const startMin = timeToMinutes(entry.start_time);
-                  const endMin = timeToMinutes(entry.end_time);
+            return (
+              <div
+                key={dateStr}
+                className={`relative flex-1 border-r border-zinc-100 last:border-r-0 dark:border-zinc-700 ${
+                  today ? "bg-red-50/40 dark:bg-red-950/10" : ""
+                }`}
+              >
+                {/* Hour lines */}
+                {Array.from({ length: TOTAL_HOURS }, (_, i) => (
+                  <div
+                    key={i}
+                    className="absolute left-0 w-full border-t border-zinc-50 dark:border-zinc-750"
+                    style={{ top: i * HOUR_HEIGHT }}
+                  />
+                ))}
+
+                {/* Event blocks */}
+                {dayEvents.map((event) => {
+                  const startMin = parseTime(event.start_time);
+                  const endMin = parseTime(event.end_time);
+
+                  if (startMin === null || endMin === null) return null;
+
                   const top =
                     ((startMin - START_HOUR * 60) / 60) * HOUR_HEIGHT;
                   const height = ((endMin - startMin) / 60) * HOUR_HEIGHT;
-                  const color = getColor(entry);
+                  const color = getColor(event.type);
                   const light = isLightColor(color);
 
                   return (
                     <button
-                      key={entry.id}
+                      key={event.id}
                       onClick={() =>
                         setSelected(
-                          selected?.id === entry.id ? null : entry
+                          selected?.id === event.id ? null : event
                         )
                       }
                       className="absolute left-0.5 right-0.5 cursor-pointer overflow-hidden rounded-md px-1 py-0.5 text-left transition-opacity hover:opacity-90"
                       style={{
-                        top,
+                        top: Math.max(top, 0),
                         height: Math.max(height, 20),
                         backgroundColor: color,
                         color: light ? "#1f2937" : "#ffffff",
                       }}
                     >
                       <p className="truncate text-[10px] font-semibold leading-tight sm:text-xs">
-                        {entry.title}
+                        {event.title}
                       </p>
                       <p className="truncate text-[9px] leading-tight opacity-80 sm:text-[10px]">
-                        {formatTime(entry.start_time)}
+                        {formatTime(event.start_time)}
                       </p>
                     </button>
                   );
                 })}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Selected entry tooltip */}
+      {/* Selected event tooltip */}
       {selected && (
         <div className="mt-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
           <div className="flex items-center justify-between">
@@ -169,20 +242,25 @@ export const WeeklyCalendar = ({
                 {selected.title}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                {DAYS[selected.day_of_week]} {formatTime(selected.start_time)}{" "}
-                &ndash; {formatTime(selected.end_time)}
+                {formatDayHeader(selected.date).day}{" "}
+                {formatDayHeader(selected.date).date}
+                {selected.start_time && selected.end_time && (
+                  <>
+                    {" "}
+                    {formatTime(selected.start_time)} &ndash;{" "}
+                    {formatTime(selected.end_time)}
+                  </>
+                )}
               </p>
-              {selected.location_category && (
-                <>
-                  {locationMap.get(selected.location_category) && (
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                      {locationMap.get(selected.location_category)!.name}
-                      <span className="block text-xs text-zinc-400">
-                        {locationMap.get(selected.location_category)!.address}
-                      </span>
-                    </p>
-                  )}
-                </>
+              {selected.location && (
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                  {selected.location}
+                </p>
+              )}
+              {selected.description && (
+                <p className="mt-1 text-xs text-zinc-400">
+                  {selected.description}
+                </p>
               )}
             </div>
             <button

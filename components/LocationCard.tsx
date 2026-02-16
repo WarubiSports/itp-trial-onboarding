@@ -9,7 +9,7 @@ import {
   MapPin,
   ExternalLink,
 } from "lucide-react";
-import type { Location, LocationCategory } from "@/lib/types";
+import type { ITPLocation, LocationCategory } from "@/lib/types";
 
 const categoryConfig: Record<
   LocationCategory,
@@ -25,7 +25,7 @@ const categoryConfig: Record<
   leisure: { label: "Leisure", icon: TreePine },
 };
 
-export const LocationCard = ({ location }: { location: Location }) => {
+export const LocationCard = ({ location }: { location: ITPLocation }) => {
   const config = categoryConfig[location.category];
   const Icon = config.icon;
 

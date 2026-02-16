@@ -1,127 +1,86 @@
+import { config } from "dotenv";
+config({ path: ".env.local" });
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!serviceKey) {
+  console.error("SUPABASE_SERVICE_ROLE_KEY required in .env.local");
+  process.exit(1);
+}
 
-const PLAYER_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+const supabase = createClient(supabaseUrl, serviceKey);
+
+// Use a fixed UUID for the test trial prospect
+const PROSPECT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 
 async function seed() {
-  console.log("Seeding ITP Trial Onboarding data...\n");
+  console.log("Seeding test trial prospect + calendar events...\n");
 
-  // Delete existing seed data
-  await supabase.from("onboarding_schedule_entries").delete().eq("player_id", PLAYER_ID);
-  await supabase.from("onboarding_locations").delete().eq("player_id", PLAYER_ID);
-  await supabase.from("onboarding_players").delete().eq("id", PLAYER_ID);
+  // Clean existing test data
+  await supabase.from("events").delete().eq("description", "TRIAL_SEED_DATA");
+  await supabase.from("trial_prospects").delete().eq("id", PROSPECT_ID);
 
-  // Insert player
-  const { error: playerError } = await supabase.from("onboarding_players").insert({
-    id: PLAYER_ID,
-    name: "Nehemiah Mason",
-    itp_location: "Köln",
-    season: "2025/26",
+  // Create trial prospect
+  const { error: prospectError } = await supabase.from("trial_prospects").insert({
+    id: PROSPECT_ID,
+    first_name: "Nehemiah",
+    last_name: "Mason",
+    date_of_birth: "2007-03-15",
+    position: "CM",
+    nationality: "USA",
+    current_club: "FC Dallas Academy",
+    trial_start_date: "2026-03-02",
+    trial_end_date: "2026-03-08",
+    status: "scheduled",
   });
-  if (playerError) throw playerError;
-  console.log("Player created: Nehemiah Mason");
+  if (prospectError) throw prospectError;
+  console.log("  Trial prospect: Nehemiah Mason (Mar 2-8, 2026)");
 
-  // Insert locations
-  const locations = [
-    { category: "housing", name: "TBD", address: "To be confirmed", maps_url: null },
-    {
-      category: "training",
-      name: "Kunstrasenplätze Salzburger Weg",
-      address: "Salzburger Weg, 50858 Köln-Junkersdorf",
-      maps_url: "https://maps.google.com/?q=Salzburger+Weg+50858+Köln",
-    },
-    {
-      category: "gym",
-      name: "BluePIT Lövenich",
-      address: "Dieselstraße 6, 50859 Köln",
-      maps_url: "https://maps.google.com/?q=Dieselstraße+6+50859+Köln",
-    },
-    {
-      category: "language_school",
-      name: "1. FC Köln Sportinternat",
-      address: "Olympiaweg 3, 50933 Köln",
-      maps_url: "https://maps.google.com/?q=Olympiaweg+3+50933+Köln",
-    },
-    {
-      category: "dining",
-      name: "Spoho Mensa",
-      address: "Am Sportpark Müngersdorf 6, 50933 Köln",
-      maps_url: "https://maps.google.com/?q=Am+Sportpark+Müngersdorf+6+50933+Köln",
-    },
-    {
-      category: "physio",
-      name: "ALC Physiolab",
-      address: "Goltsteinstrasse 87a, 50968 Köln",
-      maps_url: "https://maps.google.com/?q=Goltsteinstrasse+87a+50968+Köln",
-    },
-    { category: "train_station", name: "TBD", address: "To be confirmed", maps_url: null },
-    {
-      category: "leisure",
-      name: "Kölner Dom",
-      address: "Domkloster 4, 50667 Köln",
-      maps_url: "https://maps.google.com/?q=Domkloster+4+50667+Köln",
-    },
+  // Create calendar events for trial week (ISO timestamps with Berlin timezone)
+  const tz = "+01:00"; // CET (March = winter time)
+  const events = [
+    // Monday Mar 2
+    { date: "2026-03-02", title: "Training", start_time: `2026-03-02T09:00:00${tz}`, end_time: `2026-03-02T11:00:00${tz}`, type: "team_training", location: "Salzburger Weg" },
+    { date: "2026-03-02", title: "Lunch", start_time: `2026-03-02T12:00:00${tz}`, end_time: `2026-03-02T13:00:00${tz}`, type: "other", location: "Spoho Mensa" },
+    { date: "2026-03-02", title: "Gym", start_time: `2026-03-02T14:00:00${tz}`, end_time: `2026-03-02T15:30:00${tz}`, type: "gym", location: "BluePIT Lövenich" },
+
+    // Tuesday Mar 3
+    { date: "2026-03-03", title: "Training", start_time: `2026-03-03T09:00:00${tz}`, end_time: `2026-03-03T11:00:00${tz}`, type: "team_training", location: "Salzburger Weg" },
+    { date: "2026-03-03", title: "Lunch", start_time: `2026-03-03T12:00:00${tz}`, end_time: `2026-03-03T13:00:00${tz}`, type: "other", location: "Spoho Mensa" },
+    { date: "2026-03-03", title: "German Class", start_time: `2026-03-03T14:00:00${tz}`, end_time: `2026-03-03T15:30:00${tz}`, type: "language_class", location: "Sportinternat" },
+
+    // Wednesday Mar 4
+    { date: "2026-03-04", title: "Training", start_time: `2026-03-04T09:00:00${tz}`, end_time: `2026-03-04T11:00:00${tz}`, type: "team_training", location: "Salzburger Weg" },
+    { date: "2026-03-04", title: "Lunch", start_time: `2026-03-04T12:00:00${tz}`, end_time: `2026-03-04T13:00:00${tz}`, type: "other", location: "Spoho Mensa" },
+    { date: "2026-03-04", title: "Gym", start_time: `2026-03-04T14:00:00${tz}`, end_time: `2026-03-04T15:30:00${tz}`, type: "gym", location: "BluePIT Lövenich" },
+
+    // Thursday Mar 5
+    { date: "2026-03-05", title: "Training", start_time: `2026-03-05T09:00:00${tz}`, end_time: `2026-03-05T11:00:00${tz}`, type: "team_training", location: "Salzburger Weg" },
+    { date: "2026-03-05", title: "Lunch", start_time: `2026-03-05T12:00:00${tz}`, end_time: `2026-03-05T13:00:00${tz}`, type: "other", location: "Spoho Mensa" },
+    { date: "2026-03-05", title: "German Class", start_time: `2026-03-05T14:00:00${tz}`, end_time: `2026-03-05T15:30:00${tz}`, type: "language_class", location: "Sportinternat" },
+
+    // Friday Mar 6
+    { date: "2026-03-06", title: "Training", start_time: `2026-03-06T09:00:00${tz}`, end_time: `2026-03-06T11:00:00${tz}`, type: "team_training", location: "Salzburger Weg" },
+    { date: "2026-03-06", title: "Lunch", start_time: `2026-03-06T12:00:00${tz}`, end_time: `2026-03-06T13:00:00${tz}`, type: "other", location: "Spoho Mensa" },
+    { date: "2026-03-06", title: "Gym", start_time: `2026-03-06T14:00:00${tz}`, end_time: `2026-03-06T15:30:00${tz}`, type: "gym", location: "BluePIT Lövenich" },
+
+    // Saturday Mar 7
+    { date: "2026-03-07", title: "Match Day", start_time: `2026-03-07T10:00:00${tz}`, end_time: `2026-03-07T12:00:00${tz}`, type: "match", location: "Salzburger Weg" },
+    { date: "2026-03-07", title: "Lunch", start_time: `2026-03-07T12:30:00${tz}`, end_time: `2026-03-07T13:30:00${tz}`, type: "other", location: "Spoho Mensa" },
+
+    // Sunday Mar 8
+    // Rest day — no events
   ];
 
-  const { error: locError } = await supabase.from("onboarding_locations").insert(
-    locations.map((l) => ({ ...l, player_id: PLAYER_ID }))
+  const { error: eventsError } = await supabase.from("events").insert(
+    events.map((e) => ({ ...e, all_day: false, description: "TRIAL_SEED_DATA" }))
   );
-  if (locError) throw locError;
-  console.log(`${locations.length} locations created`);
+  if (eventsError) throw eventsError;
+  console.log(`  ${events.length} calendar events (Mar 2-8)`);
 
-  // Insert schedule entries
-  const schedule = [
-    // Monday (0)
-    { day_of_week: 0, title: "Training", start_time: "09:00", end_time: "11:00", location_category: "training", color: "#22c55e" },
-    { day_of_week: 0, title: "Lunch", start_time: "12:00", end_time: "13:00", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 0, title: "Gym", start_time: "14:00", end_time: "15:30", location_category: "gym", color: "#3b82f6" },
-    { day_of_week: 0, title: "Free Time", start_time: "16:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Tuesday (1)
-    { day_of_week: 1, title: "Training", start_time: "09:00", end_time: "11:00", location_category: "training", color: "#22c55e" },
-    { day_of_week: 1, title: "Lunch", start_time: "12:00", end_time: "13:00", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 1, title: "German Class", start_time: "14:00", end_time: "15:30", location_category: "language_school", color: "#f97316" },
-    { day_of_week: 1, title: "Free Time", start_time: "16:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Wednesday (2)
-    { day_of_week: 2, title: "Training", start_time: "09:00", end_time: "11:00", location_category: "training", color: "#22c55e" },
-    { day_of_week: 2, title: "Lunch", start_time: "12:00", end_time: "13:00", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 2, title: "Gym", start_time: "14:00", end_time: "15:30", location_category: "gym", color: "#3b82f6" },
-    { day_of_week: 2, title: "Free Time", start_time: "16:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Thursday (3)
-    { day_of_week: 3, title: "Training", start_time: "09:00", end_time: "11:00", location_category: "training", color: "#22c55e" },
-    { day_of_week: 3, title: "Lunch", start_time: "12:00", end_time: "13:00", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 3, title: "German Class", start_time: "14:00", end_time: "15:30", location_category: "language_school", color: "#f97316" },
-    { day_of_week: 3, title: "Free Time", start_time: "16:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Friday (4)
-    { day_of_week: 4, title: "Training", start_time: "09:00", end_time: "11:00", location_category: "training", color: "#22c55e" },
-    { day_of_week: 4, title: "Lunch", start_time: "12:00", end_time: "13:00", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 4, title: "Gym", start_time: "14:00", end_time: "15:30", location_category: "gym", color: "#3b82f6" },
-    { day_of_week: 4, title: "Free Time", start_time: "16:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Saturday (5)
-    { day_of_week: 5, title: "Match Day", start_time: "10:00", end_time: "12:00", location_category: "training", color: "#ED1C24" },
-    { day_of_week: 5, title: "Lunch", start_time: "12:30", end_time: "13:30", location_category: "dining", color: "#9ca3af" },
-    { day_of_week: 5, title: "Free Time", start_time: "14:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-
-    // Sunday (6) — Rest day
-    { day_of_week: 6, title: "Free Time", start_time: "10:00", end_time: "18:00", location_category: null, color: "#e5e7eb" },
-  ];
-
-  const { error: schedError } = await supabase.from("onboarding_schedule_entries").insert(
-    schedule.map((s) => ({ ...s, player_id: PLAYER_ID }))
-  );
-  if (schedError) throw schedError;
-  console.log(`${schedule.length} schedule entries created`);
-
-  console.log(`\nDone! View at: /{player_id}`);
-  console.log(`Player ID: ${PLAYER_ID}`);
+  console.log(`\nDone! Test URL: /<app>/a1b2c3d4-e5f6-7890-abcd-ef1234567890`);
 }
 
 seed().catch((err) => {

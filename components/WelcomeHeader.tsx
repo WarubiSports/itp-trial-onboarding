@@ -1,4 +1,4 @@
-import type { Player } from "@/lib/types";
+import type { TrialProspect } from "@/lib/types";
 
 const FCKolnCrest = () => (
   <svg viewBox="0 0 100 120" className="h-16 w-14" aria-label="1. FC Köln crest">
@@ -33,20 +33,33 @@ const FCKolnCrest = () => (
   </svg>
 );
 
-export const WelcomeHeader = ({ player }: { player: Player }) => {
+const formatDate = (dateStr?: string): string => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
+
+export const WelcomeHeader = ({ prospect }: { prospect: TrialProspect }) => {
+  const trialRange =
+    prospect.trial_start_date && prospect.trial_end_date
+      ? `${formatDate(prospect.trial_start_date)} – ${formatDate(prospect.trial_end_date)}`
+      : null;
+
   return (
     <section className="flex flex-col items-center gap-3 pb-6 pt-8 text-center">
       <FCKolnCrest />
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
-        Welcome to the ITP {player.itp_location}
+        Welcome to the ITP Köln
       </h1>
       <div className="flex flex-col gap-0.5">
         <p className="text-lg font-medium text-zinc-700 dark:text-zinc-300">
-          {player.name}
+          {prospect.first_name} {prospect.last_name}
         </p>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Season {player.season}
-        </p>
+        {trialRange && (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Trial: {trialRange}
+          </p>
+        )}
       </div>
     </section>
   );

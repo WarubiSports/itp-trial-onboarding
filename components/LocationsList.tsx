@@ -1,4 +1,4 @@
-import type { Location, LocationCategory } from "@/lib/types";
+import type { ITPLocation, LocationCategory } from "@/lib/types";
 import { LocationCard } from "./LocationCard";
 
 const categoryOrder: LocationCategory[] = [
@@ -12,10 +12,12 @@ const categoryOrder: LocationCategory[] = [
   "leisure",
 ];
 
-export const LocationsList = ({ locations }: { locations: Location[] }) => {
+export const LocationsList = ({ locations }: { locations: ITPLocation[] }) => {
   const sorted = categoryOrder
     .map((cat) => locations.find((l) => l.category === cat))
-    .filter((l): l is Location => l !== undefined);
+    .filter((l): l is ITPLocation => l !== undefined);
+
+  if (sorted.length === 0) return null;
 
   return (
     <section className="px-4 pb-12">
