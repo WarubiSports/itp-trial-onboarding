@@ -4,9 +4,6 @@ import { useState } from "react";
 import type { CalendarEvent } from "@/lib/types";
 
 const HOUR_HEIGHT = 56;
-const START_HOUR = 6;
-const END_HOUR = 22;
-const TOTAL_HOURS = END_HOUR - START_HOUR;
 
 // Map calendar_events.type to display colors
 const typeColors: Record<string, string> = {
@@ -31,6 +28,31 @@ const typeColors: Record<string, string> = {
 };
 
 const getColor = (type: string): string => typeColors[type] || "#9ca3af";
+
+// Short labels for narrow mobile columns
+const shortLabels: Record<string, string> = {
+  team_training: "Train",
+  individual_training: "Indiv",
+  training: "Train",
+  trial: "Trial",
+  prospect_trial: "Trial",
+  gym: "Gym",
+  recovery: "Recov",
+  match: "Match",
+  tournament: "Match",
+  language_class: "Lang",
+  school: "School",
+  video_session: "Video",
+  medical: "Med",
+  meeting: "Meet",
+  airport_pickup: "Pickup",
+  team_activity: "Team",
+  other: "Other",
+  visa: "Visa",
+};
+
+const getShortLabel = (event: CalendarEvent): string =>
+  shortLabels[event.type] || event.title.split(" ")[0];
 
 const isLightColor = (hex: string): boolean => {
   const c = hex.replace("#", "");
@@ -123,6 +145,19 @@ export const WeeklyCalendar = ({
     eventsByDate.set(event.date, existing);
   }
 
+  // Dynamic hour range from actual events (±1 hour padding)
+  let minHour = 9;
+  let maxHour = 18;
+  for (const event of events) {
+    const s = parseTime(event.start_time);
+    const e = parseTime(event.end_time);
+    if (s !== null) minHour = Math.min(minHour, Math.floor(s / 60));
+    if (e !== null) maxHour = Math.max(maxHour, Math.ceil(e / 60));
+  }
+  const startHour = Math.max(minHour - 1, 0);
+  const endHour = Math.min(maxHour + 1, 24);
+  const totalHours = endHour - startHour;
+
   return (
     <section className="px-4 pb-8">
       <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-50">
@@ -153,17 +188,17 @@ export const WeeklyCalendar = ({
       <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
         <div
           className="relative flex"
-          style={{ height: TOTAL_HOURS * HOUR_HEIGHT }}
+          style={{ height: totalHours * HOUR_HEIGHT }}
         >
           {/* Time axis */}
           <div className="relative w-10 shrink-0 border-r border-zinc-100 dark:border-zinc-700">
-            {Array.from({ length: TOTAL_HOURS }, (_, i) => (
+            {Array.from({ length: totalHours }, (_, i) => (
               <div
                 key={i}
                 className="absolute left-0 w-full pr-1 text-right text-[10px] text-zinc-400"
                 style={{ top: i * HOUR_HEIGHT - 6 }}
               >
-                {(START_HOUR + i).toString().padStart(2, "0")}
+                {(startHour + i).toString().padStart(2, "0")}
               </div>
             ))}
           </div>
@@ -181,7 +216,7 @@ export const WeeklyCalendar = ({
                 }`}
               >
                 {/* Hour lines */}
-                {Array.from({ length: TOTAL_HOURS }, (_, i) => (
+                {Array.from({ length: totalHours }, (_, i) => (
                   <div
                     key={i}
                     className="absolute left-0 w-full border-t border-zinc-50 dark:border-zinc-750"
@@ -197,7 +232,7 @@ export const WeeklyCalendar = ({
                   if (startMin === null || endMin === null) return null;
 
                   const top =
-                    ((startMin - START_HOUR * 60) / 60) * HOUR_HEIGHT;
+                    ((startMin - startHour * 60) / 60) * HOUR_HEIGHT;
                   const height = ((endMin - startMin) / 60) * HOUR_HEIGHT;
                   const color = getColor(event.type);
                   const light = isLightColor(color);
@@ -218,7 +253,10 @@ export const WeeklyCalendar = ({
                         color: light ? "#1f2937" : "#ffffff",
                       }}
                     >
-                      <p className="truncate text-[10px] font-semibold leading-tight sm:text-xs">
+                      <p className="truncate text-[10px] font-semibold leading-tight sm:hidden">
+                        {getShortLabel(event)}
+                      </p>
+                      <p className="hidden truncate text-xs font-semibold leading-tight sm:block">
                         {event.title}
                       </p>
                       <p className="truncate text-[9px] leading-tight opacity-80 sm:text-[10px]">

@@ -5,6 +5,8 @@ import { WelcomeHeader } from "@/components/WelcomeHeader";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { LocationsList } from "@/components/LocationsList";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{ playerId: string }>;
 };
