@@ -24,6 +24,12 @@ export default async function OnboardingPage({ params }: Props) {
 
   const player = prospect as TrialProspect;
 
+  // Only allow onboarding for confirmed trial statuses
+  const onboardingStatuses = ['scheduled', 'in_progress', 'evaluation', 'decision_pending', 'accepted', 'placed'];
+  if (!onboardingStatuses.includes(player.status)) {
+    notFound();
+  }
+
   // Auto-detect U18 status
   const dob = new Date(player.date_of_birth);
   const trialStart = player.trial_start_date

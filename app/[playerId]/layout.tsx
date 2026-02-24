@@ -26,10 +26,16 @@ export default async function PlayerLayout({ params, children }: Props) {
 
   const player = prospect as TrialProspect;
 
+  // Only show onboarding tab for confirmed trial statuses
+  const onboardingStatuses = ['scheduled', 'in_progress', 'evaluation', 'decision_pending', 'accepted', 'placed'];
+  const showOnboarding = onboardingStatuses.includes(player.status);
+
   return (
     <main className="mx-auto min-h-screen max-w-lg pb-safe">
       <WelcomeHeader prospect={player} />
-      <TabNav playerId={playerId} completed={!!player.onboarding_completed_at} />
+      {showOnboarding ? (
+        <TabNav playerId={playerId} completed={!!player.onboarding_completed_at} />
+      ) : null}
       {children}
     </main>
   );
