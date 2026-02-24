@@ -451,7 +451,8 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
             1. Vollmacht (Power of Attorney)
           </p>
           <a
-            href={`/api/onboarding/templates/vollmacht?prospectId=${prospect.id}`}
+            href="/vollmacht.pdf"
+            download="Vollmacht.pdf"
             className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             <FileText size={16} /> Download Vollmacht PDF
