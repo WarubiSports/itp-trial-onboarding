@@ -29,7 +29,8 @@ export async function POST(request: Request) {
     const fields = [
       "arrival_date", "arrival_time", "flight_number", "arrival_airport",
       "needs_pickup", "whatsapp_number", "equipment_size",
-      "schengen_last_180_days", "is_under_18",
+      "schengen_last_180_days", "schengen_entry_date", "schengen_days_spent",
+      "is_under_18",
       "passport_file_path", "parent1_passport_file_path",
       "parent2_passport_file_path", "vollmacht_file_path",
       "wellpass_consent_file_path",

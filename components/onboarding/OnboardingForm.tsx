@@ -36,6 +36,8 @@ type FormState = {
   whatsapp_number: string;
   equipment_size: string;
   schengen_last_180_days: boolean | null;
+  schengen_entry_date: string;
+  schengen_days_spent: string;
 };
 
 const STORAGE_KEY = (id: string) => `onboarding_${id}`;
@@ -69,6 +71,8 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
       whatsapp_number: prospect.whatsapp_number || "",
       equipment_size: prospect.equipment_size || "",
       schengen_last_180_days: prospect.schengen_last_180_days ?? null,
+      schengen_entry_date: prospect.schengen_entry_date || "",
+      schengen_days_spent: prospect.schengen_days_spent?.toString() || "",
     };
   });
 
@@ -95,6 +99,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
           step: nextStep,
           data: {
             ...form,
+            schengen_days_spent: form.schengen_days_spent ? parseInt(form.schengen_days_spent, 10) : null,
             is_under_18: isUnder18,
             passport_file_path: passportPath || undefined,
             parent1_passport_file_path: parent1PassportPath || undefined,
@@ -171,6 +176,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
           submit: true,
           data: {
             ...form,
+            schengen_days_spent: form.schengen_days_spent ? parseInt(form.schengen_days_spent, 10) : null,
             is_under_18: isUnder18,
             passport_file_path: passportPath || undefined,
             parent1_passport_file_path: parent1PassportPath || undefined,
@@ -368,6 +374,31 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
           This helps us understand your visa situation for the Schengen 90/180 rule.
         </p>
       </div>
+      {form.schengen_last_180_days === true && (
+        <>
+          <div>
+            <label className="label">When did you last enter the Schengen area?</label>
+            <input
+              type="date"
+              value={form.schengen_entry_date}
+              onChange={(e) => update("schengen_entry_date", e.target.value)}
+              className="input"
+            />
+          </div>
+          <div>
+            <label className="label">How many days have you spent in Schengen (last 180 days)?</label>
+            <input
+              type="number"
+              placeholder="e.g. 14"
+              min="1"
+              max="180"
+              value={form.schengen_days_spent}
+              onChange={(e) => update("schengen_days_spent", e.target.value)}
+              className="input"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 
@@ -472,6 +503,12 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
         <SummaryRow label="WhatsApp" value={form.whatsapp_number || "Not provided"} />
         <SummaryRow label="Equipment Size" value={form.equipment_size || "Not set"} />
         <SummaryRow label="Schengen 180d" value={form.schengen_last_180_days === null ? "Not answered" : form.schengen_last_180_days ? "Yes" : "No"} />
+        {form.schengen_last_180_days && (
+          <>
+            <SummaryRow label="Last Entry" value={form.schengen_entry_date || "Not provided"} />
+            <SummaryRow label="Days Spent" value={form.schengen_days_spent || "Not provided"} />
+          </>
+        )}
         <SummaryRow label="Passport" value={passportPath ? "Uploaded" : "Missing"} highlight={!passportPath} />
         {isUnder18 && (
           <>

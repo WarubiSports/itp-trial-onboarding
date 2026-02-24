@@ -26,6 +26,8 @@ export type TrialProspect = {
   needs_pickup?: boolean;
   whatsapp_number?: string;
   schengen_last_180_days?: boolean;
+  schengen_entry_date?: string;
+  schengen_days_spent?: number;
   is_under_18?: boolean;
   passport_file_path?: string;
   parent1_passport_file_path?: string;
@@ -47,6 +49,8 @@ export type OnboardingFormData = {
   // Step 2: Equipment & Schengen
   equipment_size: string;
   schengen_last_180_days: boolean | null;
+  schengen_entry_date: string;
+  schengen_days_spent: number | null;
   // Step 3: Documents (file paths set via upload)
   // Step 4: U18 Forms (conditional)
   // Step 5: Confirm & submit
