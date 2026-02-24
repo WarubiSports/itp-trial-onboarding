@@ -19,10 +19,10 @@ type Props = {
   isUnder18: boolean;
 };
 
-const AIRPORTS = [
+const ARRIVAL_POINTS = [
   { value: "CGN", label: "Cologne/Bonn (CGN)" },
   { value: "DUS", label: "Düsseldorf (DUS)" },
-  { value: "FRA", label: "Frankfurt (FRA)" },
+  { value: "KLN_HBF", label: "Köln Hbf (Train)" },
 ];
 
 const SIZES = ["S", "M", "L", "XL"];
@@ -117,9 +117,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
   const validateStep = (currentStep: number): string | null => {
     switch (currentStep) {
       case 1:
-        if (!form.arrival_date) return "Please enter your arrival date";
-        if (!form.whatsapp_number) return "Please enter a WhatsApp number";
-        return null;
+        return null; // Travel is optional — can be skipped
       case 2:
         if (!form.equipment_size) return "Please select your equipment size";
         if (form.schengen_last_180_days === null) return "Please answer the Schengen question";
@@ -266,9 +264,9 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
         />
       </div>
       <div>
-        <label className="label">Arrival Airport</label>
+        <label className="label">Arrival Point</label>
         <div className="grid grid-cols-3 gap-2">
-          {AIRPORTS.map((a) => (
+          {ARRIVAL_POINTS.map((a) => (
             <button
               key={a.value}
               type="button"
@@ -285,7 +283,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
         </div>
       </div>
       <div>
-        <label className="label">Do you need a pick-up from the airport?</label>
+        <label className="label">Do you need a pick-up?</label>
         <div className="grid grid-cols-2 gap-2">
           {[true, false].map((val) => (
             <button
@@ -469,7 +467,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
       <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white dark:divide-zinc-700 dark:border-zinc-700 dark:bg-zinc-800">
         <SummaryRow label="Arrival" value={form.arrival_date ? `${form.arrival_date} at ${form.arrival_time || "TBD"}` : "Not set"} />
         <SummaryRow label="Flight" value={form.flight_number || "Not provided"} />
-        <SummaryRow label="Airport" value={AIRPORTS.find((a) => a.value === form.arrival_airport)?.label || form.arrival_airport} />
+        <SummaryRow label="Arrival Point" value={ARRIVAL_POINTS.find((a) => a.value === form.arrival_airport)?.label || form.arrival_airport || "Not set"} />
         <SummaryRow label="Pick-up" value={form.needs_pickup ? "Yes" : "No"} />
         <SummaryRow label="WhatsApp" value={form.whatsapp_number || "Not provided"} />
         <SummaryRow label="Equipment Size" value={form.equipment_size || "Not set"} />
@@ -537,6 +535,15 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
       )}
 
       {/* Navigation */}
+      {step === 1 && (
+        <button
+          type="button"
+          onClick={nextStep}
+          className="mb-2 w-full text-center text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+        >
+          Skip — I&apos;ll fill this in later
+        </button>
+      )}
       <div className="flex gap-3">
         {step > 1 && (
           <button type="button" onClick={prevStep} className="btn-secondary flex-1">
