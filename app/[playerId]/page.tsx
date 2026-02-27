@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import type { TrialProspect, CalendarEvent, ITPLocation } from "@/lib/types";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { LocationsList } from "@/components/LocationsList";
+import { TravelForm } from "@/components/TravelForm";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,17 @@ export default async function PlayerPage({ params }: Props) {
           </div>
         </section>
       )}
+      <TravelForm
+        prospectId={playerId}
+        initial={{
+          arrival_date: player.arrival_date,
+          arrival_time: player.arrival_time,
+          flight_number: player.flight_number,
+          arrival_airport: player.arrival_airport,
+          needs_pickup: player.needs_pickup,
+          whatsapp_number: player.whatsapp_number,
+        }}
+      />
       <WeeklyCalendar
         events={events}
         startDate={startDate || ""}

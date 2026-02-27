@@ -22,9 +22,12 @@ export async function POST(request: Request) {
     }
 
     // Build update payload - only include non-undefined fields
-    const updateData: Record<string, unknown> = {
-      onboarding_step: step,
-    };
+    const updateData: Record<string, unknown> = {};
+
+    // Only update onboarding_step if > 0 (travel form on info page sends 0)
+    if (step > 0) {
+      updateData.onboarding_step = step;
+    }
 
     const fields = [
       "arrival_date", "arrival_time", "flight_number", "arrival_airport",
