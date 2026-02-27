@@ -24,9 +24,8 @@ export default async function OnboardingPage({ params }: Props) {
 
   const player = prospect as TrialProspect;
 
-  // Only allow onboarding for confirmed trial statuses
-  const onboardingStatuses = ['scheduled', 'in_progress', 'evaluation', 'decision_pending', 'accepted', 'placed'];
-  if (!onboardingStatuses.includes(player.status)) {
+  // Only allow onboarding for committed players
+  if (!['accepted', 'placed'].includes(player.status) && !player.onboarding_completed_at) {
     notFound();
   }
 

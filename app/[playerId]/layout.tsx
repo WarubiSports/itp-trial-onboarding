@@ -26,9 +26,8 @@ export default async function PlayerLayout({ params, children }: Props) {
 
   const player = prospect as TrialProspect;
 
-  // Only show onboarding tab for confirmed trial statuses
-  const onboardingStatuses = ['scheduled', 'in_progress', 'evaluation', 'decision_pending', 'accepted', 'placed'];
-  const showOnboarding = onboardingStatuses.includes(player.status);
+  // Only show onboarding tab for committed players
+  const showOnboarding = ['accepted', 'placed'].includes(player.status) || !!player.onboarding_completed_at;
 
   return (
     <main className="mx-auto min-h-screen max-w-lg pb-safe">
