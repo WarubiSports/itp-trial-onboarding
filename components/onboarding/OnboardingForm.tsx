@@ -211,23 +211,6 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center gap-4 px-4 py-12 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
-          <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
-        </div>
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-          Onboarding Complete
-        </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Thank you, {prospect.first_name}! The ITP staff has been notified and
-          will be in touch before your arrival.
-        </p>
-      </div>
-    );
-  }
-
   // Step indicators
   const stepLabels = isUnder18
     ? ["Travel", "Equipment", "Documents", "U18 Forms", "Confirm"]
@@ -538,6 +521,15 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
 
   return (
     <div className="px-4 pb-8">
+      {/* Completed banner */}
+      {submitted && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/40">
+          <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+          <p className="text-sm text-green-800 dark:text-green-300">
+            Onboarding submitted. You can still update your details below.
+          </p>
+        </div>
+      )}
       {/* Step indicator */}
       <div className="mb-6 flex items-center gap-1">
         {stepLabels.map((label, i) => {
@@ -617,7 +609,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
                 <Loader2 size={16} className="animate-spin" /> Submitting...
               </>
             ) : (
-              <>Submit Onboarding</>
+              <>{submitted ? "Update Onboarding" : "Submit Onboarding"}</>
             )}
           </button>
         )}
