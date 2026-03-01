@@ -485,7 +485,8 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
             2. Wellpass Gym Consent
           </p>
           <a
-            href={`/api/onboarding/templates/wellpass?prospectId=${prospect.id}`}
+            href="/wellpass-consent.pdf"
+            download="EGYM_Wellpass_Einverstaendniserklaerung.pdf"
             className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             <FileText size={16} /> Download Wellpass Consent PDF
