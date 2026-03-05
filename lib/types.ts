@@ -36,6 +36,7 @@ export type TrialProspect = {
   wellpass_consent_file_path?: string;
   onboarding_step?: number;
   onboarding_completed_at?: string;
+  travel_submitted_at?: string;
 };
 
 export type OnboardingFormData = {

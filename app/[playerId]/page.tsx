@@ -62,14 +62,14 @@ export default async function PlayerPage({ params }: Props) {
       )}
       <TravelForm
         prospectId={playerId}
-        initial={{
+        initial={player.travel_submitted_at ? {
           arrival_date: player.arrival_date,
           arrival_time: player.arrival_time,
           flight_number: player.flight_number,
           arrival_airport: player.arrival_airport,
           needs_pickup: player.needs_pickup,
           whatsapp_number: player.whatsapp_number,
-        }}
+        } : {}}
       />
       <WeeklyCalendar
         events={events}

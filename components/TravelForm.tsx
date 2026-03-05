@@ -59,6 +59,7 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
             arrival_airport: form.arrival_airport || null,
             needs_pickup: form.needs_pickup,
             whatsapp_number: form.whatsapp_number || null,
+            travel_submitted_at: new Date().toISOString(),
           },
         }),
       });
