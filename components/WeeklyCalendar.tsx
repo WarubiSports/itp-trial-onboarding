@@ -101,10 +101,11 @@ export const WeeklyCalendar = ({
     existing.push(event);
     eventsByDate.set(event.date, existing);
   }
-  for (const [date, dayEvents] of eventsByDate) {
+  for (const [, dayEvents] of eventsByDate) {
     dayEvents.sort((a, b) => {
-      const timeA = a.start_time || "";
-      const timeB = b.start_time || "";
+      // Sort by displayed time (Europe/Berlin), not raw timestamp
+      const timeA = formatTime(a.start_time);
+      const timeB = formatTime(b.start_time);
       return timeA.localeCompare(timeB);
     });
   }
