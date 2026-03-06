@@ -94,12 +94,19 @@ export const WeeklyCalendar = ({
 
   const dates = getDateRange(startDate, endDate);
 
-  // Group events by date
+  // Group events by date, sorted by start_time within each day
   const eventsByDate = new Map<string, CalendarEvent[]>();
   for (const event of events) {
     const existing = eventsByDate.get(event.date) || [];
     existing.push(event);
     eventsByDate.set(event.date, existing);
+  }
+  for (const [date, dayEvents] of eventsByDate) {
+    dayEvents.sort((a, b) => {
+      const timeA = a.start_time || "";
+      const timeB = b.start_time || "";
+      return timeA.localeCompare(timeB);
+    });
   }
 
   return (
