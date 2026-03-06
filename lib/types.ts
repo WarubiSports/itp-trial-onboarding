@@ -38,6 +38,8 @@ export type TrialProspect = {
   onboarding_step?: number;
   onboarding_completed_at?: string;
   travel_submitted_at?: string;
+  room_id?: string;
+  accommodation_details?: string;
 };
 
 export type OnboardingFormData = {

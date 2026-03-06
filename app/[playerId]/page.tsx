@@ -41,7 +41,32 @@ export default async function PlayerPage({ params }: Props) {
     .select("*")
     .eq("itp_site", "Köln");
 
-  const locations = (locationsData || []) as ITPLocation[];
+  let locations = (locationsData || []) as ITPLocation[];
+
+  // If player has a room assignment, override the generic housing location
+  if (player.room_id) {
+    const { data: roomData } = await supabase
+      .from("rooms")
+      .select("name, house_id")
+      .eq("id", player.room_id)
+      .single();
+
+    if (roomData) {
+      const { data: houseData } = await supabase
+        .from("houses")
+        .select("name")
+        .eq("id", roomData.house_id)
+        .single();
+
+      if (houseData) {
+        locations = locations.map((loc) =>
+          loc.category === "housing"
+            ? { ...loc, name: `${houseData.name} — ${roomData.name}`, address: "Player House" }
+            : loc
+        );
+      }
+    }
+  }
 
   return (
     <>
