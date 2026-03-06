@@ -54,14 +54,19 @@ export default async function PlayerPage({ params }: Props) {
     if (roomData) {
       const { data: houseData } = await supabase
         .from("houses")
-        .select("name")
+        .select("name, address, maps_url")
         .eq("id", roomData.house_id)
         .single();
 
       if (houseData) {
         locations = locations.map((loc) =>
           loc.category === "housing"
-            ? { ...loc, name: `${houseData.name} — ${roomData.name}`, address: "Player House" }
+            ? {
+                ...loc,
+                name: `${houseData.name} — ${roomData.name}`,
+                address: houseData.address || "Player House",
+                maps_url: houseData.maps_url || loc.maps_url,
+              }
             : loc
         );
       }
