@@ -117,19 +117,19 @@ export default async function PlayerPage({ params }: Props) {
         </p>
         <div className="flex flex-col gap-3">
           <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
-            <a href="https://www.essential-hotels.de/hotel/koeln-junkersdorf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+            <a href="https://hotel-koeln-junkersdorf.dorint.com/en/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
               <span className="text-lg">🏨</span>
               <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Essential by Dorint Junkersdorf</span>
               <span className="text-sm font-medium text-[#ED1C24]">→</span>
             </a>
-            <a href="https://www.gartenhotel-poemick.de" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+            <a href="https://www.garten-hotel.de/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
               <span className="text-lg">🏨</span>
-              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Gartenhotel Pömick</span>
+              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Garten-Hotel Ponick</span>
               <span className="text-sm font-medium text-[#ED1C24]">→</span>
             </a>
-            <a href="https://www.leonardo-hotels.com/cologne/leonardo-hotel-cologne-stadtwald" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+            <a href="https://www.leonardo-hotels.com/cologne/leonardo-royal-hotel-koeln-am-stadtwald" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
               <span className="text-lg">🏨</span>
-              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Leonardo Hotel Köln Stadtwald</span>
+              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Leonardo Royal Hotel Köln — Am Stadtwald</span>
               <span className="text-sm font-medium text-[#ED1C24]">→</span>
             </a>
           </div>
