@@ -116,40 +116,23 @@ export default async function PlayerPage({ params }: Props) {
           Convenient options for visiting families, all near the training facility.
         </p>
         <div className="flex flex-col gap-3">
-          {[
-            {
-              name: "Essential by Dorint Junkersdorf",
-              url: "https://www.essential-hotels.de/hotel/koeln-junkersdorf",
-            },
-            {
-              name: "Gartenhotel Pömick",
-              url: "https://www.gartenhotel-poemick.de",
-            },
-            {
-              name: "Leonardo Hotel Köln Stadtwald",
-              url: "https://www.leonardo-hotels.com/cologne/leonardo-hotel-cologne-stadtwald",
-            },
-          ].map((hotel) => (
-            <a
-              key={hotel.name}
-              href={hotel.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                <span className="text-lg">🏨</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                  {hotel.name}
-                </p>
-                <p className="text-sm font-medium text-[#ED1C24]">
-                  View hotel →
-                </p>
-              </div>
+          <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
+            <a href="https://www.essential-hotels.de/hotel/koeln-junkersdorf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+              <span className="text-lg">🏨</span>
+              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Essential by Dorint Junkersdorf</span>
+              <span className="text-sm font-medium text-[#ED1C24]">→</span>
             </a>
-          ))}
+            <a href="https://www.gartenhotel-poemick.de" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+              <span className="text-lg">🏨</span>
+              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Gartenhotel Pömick</span>
+              <span className="text-sm font-medium text-[#ED1C24]">→</span>
+            </a>
+            <a href="https://www.leonardo-hotels.com/cologne/leonardo-hotel-cologne-stadtwald" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+              <span className="text-lg">🏨</span>
+              <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Leonardo Hotel Köln Stadtwald</span>
+              <span className="text-sm font-medium text-[#ED1C24]">→</span>
+            </a>
+          </div>
         </div>
       </section>
     </>
