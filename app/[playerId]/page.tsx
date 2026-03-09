@@ -127,7 +127,7 @@ export default async function PlayerPage({ params }: Props) {
               <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Garten-Hotel Ponick</span>
               <span className="text-sm font-medium text-[#ED1C24]">→</span>
             </a>
-            <a href="https://www.leonardo-hotels.com/cologne/leonardo-royal-hotel-koeln-am-stadtwald" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
+            <a href="https://www.leonardo-hotels.com/cologne/leonardo-royal-hotel-koln-am-stadtwald" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4">
               <span className="text-lg">🏨</span>
               <span className="flex-1 font-medium text-zinc-900 dark:text-zinc-100">Leonardo Royal Hotel Köln — Am Stadtwald</span>
               <span className="text-sm font-medium text-[#ED1C24]">→</span>
