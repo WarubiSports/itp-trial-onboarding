@@ -3,6 +3,14 @@
 import { useState, useCallback } from "react";
 import { Loader2, CheckCircle2, Plane } from "lucide-react";
 
+type FirstActivity = {
+  title: string;
+  day: string;
+  location: string;
+  address?: string;
+  mapsUrl?: string;
+};
+
 type Props = {
   prospectId: string;
   initial: {
@@ -14,6 +22,7 @@ type Props = {
     pickup_location?: string;
     whatsapp_number?: string;
   };
+  firstActivity?: FirstActivity;
 };
 
 const ARRIVAL_POINTS = [
@@ -24,7 +33,7 @@ const ARRIVAL_POINTS = [
 
 type PickupChoice = "airport" | "hotel" | "none";
 
-export const TravelForm = ({ prospectId, initial }: Props) => {
+export const TravelForm = ({ prospectId, initial, firstActivity }: Props) => {
   const initialPickup: PickupChoice = initial.needs_pickup === false
     ? "none"
     : initial.pickup_location
@@ -103,6 +112,20 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
         <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
           Let us know when you&apos;re arriving so we can arrange transport.
         </p>
+
+        {firstActivity && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-lg bg-zinc-50 p-3 dark:bg-zinc-700/50">
+            <span className="mt-0.5 text-sm">📍</span>
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
+              Your first activity is <strong>{firstActivity.title}</strong> on {firstActivity.day} at{' '}
+              <strong>{firstActivity.location}</strong>
+              {firstActivity.address && <span className="text-zinc-400 dark:text-zinc-500"> ({firstActivity.address})</span>}
+              {firstActivity.mapsUrl && (
+                <>{' '}<a href={firstActivity.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-[#ED1C24] underline">Maps</a></>
+              )}
+            </p>
+          </div>
+        )}
 
         <div className="space-y-3">
           <div>

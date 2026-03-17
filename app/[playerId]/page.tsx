@@ -87,7 +87,7 @@ export default async function PlayerPage({ params }: Props) {
 
   return (
     <>
-      {player.travel_arrangements ? (
+      {player.travel_arrangements && (
         <section className="px-4 pb-6">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
             <span className="mt-0.5 text-lg">🚐</span>
@@ -101,34 +101,7 @@ export default async function PlayerPage({ params }: Props) {
             </div>
           </div>
         </section>
-      ) : player.arrival_date && (() => {
-        const firstEvent = events.find(e => e.date >= player.arrival_date!)
-        if (!firstEvent) return null
-        const dayName = new Date(firstEvent.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
-        // Match event location against itp_locations for full name + maps link
-        const matchedLocation = firstEvent.location
-          ? locations.find(l => firstEvent.location!.toLowerCase().includes(l.name.split(' ').pop()!.toLowerCase()) || l.name.toLowerCase().includes(firstEvent.location!.toLowerCase()))
-          : null
-        const locationLabel = matchedLocation?.name || firstEvent.location || 'the training facility'
-        const locationAddress = matchedLocation?.address
-        const mapsUrl = matchedLocation?.maps_url
-        return (
-          <section className="px-4 pb-6">
-            <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
-              <span className="mt-0.5 text-lg">📍</span>
-              <div>
-                <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">
-                  Arrival
-                </p>
-                <p className="text-sm text-blue-800 dark:text-blue-300">
-                  No pick-up organized. Please make your own way to <strong>{locationLabel}</strong>{locationAddress && <span className="text-blue-600 dark:text-blue-400"> ({locationAddress})</span>} for {firstEvent.title} on {dayName}.
-                  {mapsUrl && <>{' '}<a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="underline font-medium text-blue-700 dark:text-blue-300">Maps</a></>}
-                </p>
-              </div>
-            </div>
-          </section>
-        )
-      })()}
+      )}
       <TravelForm
         prospectId={playerId}
         initial={player.travel_submitted_at ? {
@@ -140,6 +113,21 @@ export default async function PlayerPage({ params }: Props) {
           pickup_location: player.pickup_location,
           whatsapp_number: player.whatsapp_number,
         } : {}}
+        firstActivity={!player.travel_arrangements && player.arrival_date ? (() => {
+          const firstEvent = events.find(e => e.date >= player.arrival_date!)
+          if (!firstEvent) return undefined
+          const dayName = new Date(firstEvent.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
+          const matched = firstEvent.location
+            ? locations.find(l => firstEvent.location!.toLowerCase().includes(l.name.split(' ').pop()!.toLowerCase()) || l.name.toLowerCase().includes(firstEvent.location!.toLowerCase()))
+            : null
+          return {
+            title: firstEvent.title,
+            day: dayName,
+            location: matched?.name || firstEvent.location || 'the training facility',
+            address: matched?.address,
+            mapsUrl: matched?.maps_url || undefined,
+          }
+        })() : undefined}
       />
       <WeeklyCalendar
         events={events}
