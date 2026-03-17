@@ -11,6 +11,7 @@ type Props = {
     flight_number?: string;
     arrival_airport?: string;
     needs_pickup?: boolean;
+    pickup_location?: string;
     whatsapp_number?: string;
   };
 };
@@ -19,18 +20,26 @@ const ARRIVAL_POINTS = [
   { value: "CGN", label: "Cologne/Bonn (CGN)" },
   { value: "DUS", label: "Düsseldorf (DUS)" },
   { value: "KLN_HBF", label: "Köln Hbf (Train)" },
-  { value: "HOTEL", label: "Hotel (first activity)" },
 ];
 
+type PickupChoice = "airport" | "hotel" | "none";
+
 export const TravelForm = ({ prospectId, initial }: Props) => {
+  const initialPickup: PickupChoice = initial.needs_pickup === false
+    ? "none"
+    : initial.pickup_location
+      ? "hotel"
+      : "airport";
+
   const [form, setForm] = useState({
     arrival_date: initial.arrival_date || "",
     arrival_time: initial.arrival_time || "",
     flight_number: initial.flight_number || "",
     arrival_airport: initial.arrival_airport || "CGN",
-    needs_pickup: initial.needs_pickup ?? true,
     whatsapp_number: initial.whatsapp_number || "",
+    pickup_location: initial.pickup_location || "",
   });
+  const [pickupChoice, setPickupChoice] = useState<PickupChoice>(initialPickup);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -43,6 +52,11 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
     []
   );
 
+  const handlePickup = (choice: PickupChoice) => {
+    setPickupChoice(choice);
+    setSaved(false);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setError("");
@@ -52,13 +66,14 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prospectId,
-          step: 0, // Don't advance onboarding step
+          step: 0,
           data: {
             arrival_date: form.arrival_date || null,
             arrival_time: form.arrival_time || null,
             flight_number: form.flight_number || null,
             arrival_airport: form.arrival_airport || null,
-            needs_pickup: form.needs_pickup,
+            needs_pickup: pickupChoice !== "none",
+            pickup_location: pickupChoice === "hotel" ? (form.pickup_location || null) : null,
             whatsapp_number: form.whatsapp_number || null,
             travel_submitted_at: new Date().toISOString(),
           },
@@ -86,7 +101,7 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
           </h3>
         </div>
         <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
-          Let us know when you&apos;re arriving so we can try to arrange a pick-up.
+          Let us know when you&apos;re arriving so we can arrange transport.
         </p>
 
         <div className="space-y-3">
@@ -109,22 +124,18 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
             />
           </div>
           <div>
-            <label className="label">
-              {form.arrival_airport === "HOTEL" ? "Hotel Name / Address" : "Flight / Train Number"}
-            </label>
+            <label className="label">Flight / Train Number</label>
             <input
               type="text"
-              placeholder={form.arrival_airport === "HOTEL" ? "e.g. Dorint Hotel Junkersdorf" : "e.g. LH 1234"}
+              placeholder="e.g. LH 1234"
               value={form.flight_number}
               onChange={(e) => update("flight_number", e.target.value)}
               className="input"
             />
           </div>
           <div>
-            <label className="label">
-              {form.arrival_airport === "HOTEL" ? "Pick-up from" : "Arrival Point"}
-            </label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="label">Arrival Point</label>
+            <div className="grid grid-cols-3 gap-2">
               {ARRIVAL_POINTS.map((a) => (
                 <button
                   key={a.value}
@@ -141,25 +152,46 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
               ))}
             </div>
           </div>
+
+          {/* Pickup request — single clear question with 3 options */}
           <div>
-            <label className="label">Would you like to request a pick-up?</label>
-            <div className="grid grid-cols-2 gap-2">
-              {[true, false].map((val) => (
+            <label className="label">Need a pick-up?</label>
+            <div className="grid grid-cols-1 gap-2">
+              {([
+                { value: "airport" as const, label: "Yes, from airport / station" },
+                { value: "hotel" as const, label: "Yes, from my hotel" },
+                { value: "none" as const, label: "No, I'll get there myself" },
+              ]).map((opt) => (
                 <button
-                  key={String(val)}
+                  key={opt.value}
                   type="button"
-                  onClick={() => update("needs_pickup", val)}
-                  className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
-                    form.needs_pickup === val
+                  onClick={() => handlePickup(opt.value)}
+                  className={`rounded-lg border px-3 py-2.5 text-sm font-medium text-left transition-colors ${
+                    pickupChoice === opt.value
                       ? "border-[#ED1C24] bg-red-50 text-[#ED1C24] dark:bg-red-950/30 dark:text-red-400"
                       : "border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-600 dark:text-zinc-300"
                   }`}
                 >
-                  {val ? "Yes, please" : "No, I'm set"}
+                  {opt.label}
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Hotel name — only when hotel pickup selected */}
+          {pickupChoice === "hotel" && (
+            <div>
+              <label className="label">Hotel Name / Address</label>
+              <input
+                type="text"
+                placeholder="e.g. Dorint Hotel Junkersdorf"
+                value={form.pickup_location}
+                onChange={(e) => update("pickup_location", e.target.value)}
+                className="input"
+              />
+            </div>
+          )}
+
           <div>
             <label className="label">WhatsApp Number</label>
             <input

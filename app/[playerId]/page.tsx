@@ -137,6 +137,7 @@ export default async function PlayerPage({ params }: Props) {
           flight_number: player.flight_number,
           arrival_airport: player.arrival_airport,
           needs_pickup: player.needs_pickup,
+          pickup_location: player.pickup_location,
           whatsapp_number: player.whatsapp_number,
         } : {}}
       />

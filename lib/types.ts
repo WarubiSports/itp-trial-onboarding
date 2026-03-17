@@ -25,6 +25,7 @@ export type TrialProspect = {
   flight_number?: string;
   arrival_airport?: string;
   needs_pickup?: boolean;
+  pickup_location?: string;
   whatsapp_number?: string;
   schengen_last_180_days?: boolean;
   schengen_entry_date?: string;
