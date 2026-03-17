@@ -19,6 +19,7 @@ const ARRIVAL_POINTS = [
   { value: "CGN", label: "Cologne/Bonn (CGN)" },
   { value: "DUS", label: "Düsseldorf (DUS)" },
   { value: "KLN_HBF", label: "Köln Hbf (Train)" },
+  { value: "HOTEL", label: "Hotel (first activity)" },
 ];
 
 export const TravelForm = ({ prospectId, initial }: Props) => {
@@ -108,18 +109,22 @@ export const TravelForm = ({ prospectId, initial }: Props) => {
             />
           </div>
           <div>
-            <label className="label">Flight / Train Number</label>
+            <label className="label">
+              {form.arrival_airport === "HOTEL" ? "Hotel Name / Address" : "Flight / Train Number"}
+            </label>
             <input
               type="text"
-              placeholder="e.g. LH 1234"
+              placeholder={form.arrival_airport === "HOTEL" ? "e.g. Dorint Hotel Junkersdorf" : "e.g. LH 1234"}
               value={form.flight_number}
               onChange={(e) => update("flight_number", e.target.value)}
               className="input"
             />
           </div>
           <div>
-            <label className="label">Arrival Point</label>
-            <div className="grid grid-cols-3 gap-2">
+            <label className="label">
+              {form.arrival_airport === "HOTEL" ? "Pick-up from" : "Arrival Point"}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
               {ARRIVAL_POINTS.map((a) => (
                 <button
                   key={a.value}
