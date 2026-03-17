@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import type { TrialProspect, CalendarEvent, ITPLocation } from "@/lib/types";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { LocationsList } from "@/components/LocationsList";
+import { HousingRequest } from "@/components/HousingRequest";
 import { TravelForm } from "@/components/TravelForm";
 
 export const dynamic = "force-dynamic";
@@ -71,14 +72,80 @@ export default async function PlayerPage({ params }: Props) {
         );
       }
     }
-  } else {
-    // No room assigned — show self-organized housing
+  }
+
+  // Compute housing availability for unassigned players
+  let housingAvailability: { house_name: string; available: number; total_beds: number }[] = [];
+  let totalAvailable = 0;
+  const alreadyRequestedHousing = !player.room_id && player.accommodation_type === "house";
+
+  if (!player.room_id && startDate && endDate) {
+    const [{ data: allHouses }, { data: allRooms }, { data: activePlayers }, { data: upcomingTrialists }] =
+      await Promise.all([
+        supabase.from("houses").select("id, name"),
+        supabase.from("rooms").select("id, house_id, capacity"),
+        supabase.from("players").select("id, room_id, program_start_date, program_end_date, status").eq("status", "active"),
+        supabase
+          .from("trial_prospects")
+          .select("id, room_id, trial_start_date, trial_end_date, status")
+          .in("status", ["scheduled", "in_progress"]),
+      ]);
+
+    if (allHouses && allRooms) {
+      housingAvailability = allHouses.map((house) => {
+        const houseRooms = allRooms.filter((r) => r.house_id === house.id || r.house_id === house.name);
+        const totalBeds = houseRooms.reduce((sum, r) => sum + (r.capacity || 2), 0);
+        const roomIds = new Set(houseRooms.map((r) => r.id));
+
+        const playerCount = (activePlayers || []).filter((p) => {
+          if (!p.room_id || !roomIds.has(p.room_id)) return false;
+          const pStart = p.program_start_date || "2000-01-01";
+          const pEnd = p.program_end_date || "2099-12-31";
+          return pStart <= endDate && pEnd >= startDate;
+        }).length;
+
+        const trialistCount = (upcomingTrialists || []).filter((t) => {
+          if (!t.room_id || !roomIds.has(t.room_id)) return false;
+          if (!t.trial_start_date || !t.trial_end_date) return false;
+          return t.trial_start_date <= endDate && t.trial_end_date >= startDate;
+        }).length;
+
+        const occupied = playerCount + trialistCount;
+        return { house_name: house.name, available: Math.max(0, totalBeds - occupied), total_beds: totalBeds };
+      });
+      totalAvailable = housingAvailability.reduce((s, h) => s + h.available, 0);
+    }
+
+    // Update housing location card based on accommodation state
+    const isHotelSuggested = player.accommodation_type === "hotel";
     locations = locations.map((loc) =>
       loc.category === "housing"
         ? {
             ...loc,
-            name: "Self-Organized",
-            address: "No housing assigned yet — please organize your own accommodation.",
+            name: isHotelSuggested
+              ? "Nearby Hotel"
+              : alreadyRequestedHousing
+                ? "Housing Requested"
+                : "Self-Organized",
+            address: isHotelSuggested
+              ? (player.accommodation_notes || "We recommend one of the hotels below — all within minutes of the training facility.")
+              : alreadyRequestedHousing
+                ? "Staff will assign your room before arrival."
+                : "Request ITP housing below, or organize your own accommodation.",
+            maps_url: null,
+          }
+        : loc
+    );
+  } else if (!player.room_id) {
+    const isHotelSuggested = player.accommodation_type === "hotel";
+    locations = locations.map((loc) =>
+      loc.category === "housing"
+        ? {
+            ...loc,
+            name: isHotelSuggested ? "Nearby Hotel" : "Self-Organized",
+            address: isHotelSuggested
+              ? (player.accommodation_notes || "We recommend one of the hotels below — all within minutes of the training facility.")
+              : "No housing assigned yet — please organize your own accommodation.",
             maps_url: null,
           }
         : loc
@@ -136,12 +203,27 @@ export default async function PlayerPage({ params }: Props) {
       />
       <LocationsList locations={locations} />
 
+      {!player.room_id && startDate && endDate && player.accommodation_type !== "hotel" && (
+        <section className="px-4 pb-6">
+          <HousingRequest
+            prospectId={playerId}
+            trialStart={startDate}
+            trialEnd={endDate}
+            availability={housingAvailability}
+            totalAvailable={totalAvailable}
+            alreadyRequested={alreadyRequestedHousing}
+          />
+        </section>
+      )}
+
       <section className="px-4 pb-12">
-        <h2 className="mb-1 text-lg font-bold text-zinc-900 dark:text-zinc-50">
-          Recommended Hotels
+        <h2 className={`mb-1 text-lg font-bold ${player.accommodation_type === "hotel" ? "text-[#ED1C24]" : "text-zinc-900 dark:text-zinc-50"}`}>
+          {player.accommodation_type === "hotel" ? "Your Hotel Options" : "Recommended Hotels"}
         </h2>
         <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
-          Convenient options for visiting families, all near the training facility.
+          {player.accommodation_type === "hotel"
+            ? "All options are within minutes of the training facility. Book directly for the best rates."
+            : "Convenient options for visiting families, all near the training facility."}
         </p>
         <div className="flex flex-col gap-3">
           <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
