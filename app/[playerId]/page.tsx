@@ -105,7 +105,13 @@ export default async function PlayerPage({ params }: Props) {
         const firstEvent = events.find(e => e.date >= player.arrival_date!)
         if (!firstEvent) return null
         const dayName = new Date(firstEvent.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
-        const locationName = firstEvent.location || 'the training facility'
+        // Match event location against itp_locations for full name + maps link
+        const matchedLocation = firstEvent.location
+          ? locations.find(l => firstEvent.location!.toLowerCase().includes(l.name.split(' ').pop()!.toLowerCase()) || l.name.toLowerCase().includes(firstEvent.location!.toLowerCase()))
+          : null
+        const locationLabel = matchedLocation?.name || firstEvent.location || 'the training facility'
+        const locationAddress = matchedLocation?.address
+        const mapsUrl = matchedLocation?.maps_url
         return (
           <section className="px-4 pb-6">
             <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
@@ -115,7 +121,8 @@ export default async function PlayerPage({ params }: Props) {
                   Arrival
                 </p>
                 <p className="text-sm text-blue-800 dark:text-blue-300">
-                  No pick-up organized. Please make your own way to {locationName} for <strong>{firstEvent.title}</strong> on {dayName}.
+                  No pick-up organized. Please make your own way to <strong>{locationLabel}</strong>{locationAddress && <span className="text-blue-600 dark:text-blue-400"> ({locationAddress})</span>} for {firstEvent.title} on {dayName}.
+                  {mapsUrl && <>{' '}<a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="underline font-medium text-blue-700 dark:text-blue-300">Maps</a></>}
                 </p>
               </div>
             </div>
