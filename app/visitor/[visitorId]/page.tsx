@@ -173,7 +173,7 @@ export default async function VisitorPage({ params }: Props) {
       {/* Travel Form */}
       <VisitorTravelForm
         visitorId={visitorId}
-        initial={visitor.travel_submitted_at ? {
+        initial={{
           arrival_date: visitor.arrival_date,
           arrival_time: visitor.arrival_time,
           flight_number: visitor.flight_number,
@@ -181,7 +181,7 @@ export default async function VisitorPage({ params }: Props) {
           needs_pickup: visitor.needs_pickup,
           pickup_location: visitor.pickup_location,
           whatsapp_number: visitor.whatsapp_number,
-        } : {}}
+        }}
       />
 
       {/* Schedule */}
