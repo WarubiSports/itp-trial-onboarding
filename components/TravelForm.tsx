@@ -93,6 +93,10 @@ export const TravelForm = ({ prospectId, initial, firstActivity }: Props) => {
         throw new Error(body.error || "Failed to save");
       }
       setSaved(true);
+      // Reload to show first activity info (computed server-side from arrival_date)
+      if (!firstActivity && form.arrival_date) {
+        setTimeout(() => window.location.reload(), 1000);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save");
     } finally {
