@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ITP Trial Onboarding",
-  description: "1. FC Köln International Talent Program — Trial Player Onboarding",
+  title: "ITP Portal",
+  description: "1. FC Köln International Talent Program",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",
