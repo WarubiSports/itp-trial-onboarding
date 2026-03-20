@@ -69,6 +69,22 @@ export default async function VisitorPage({ params }: Props) {
     return (a.start_time || "").localeCompare(b.start_time || "");
   }) as CalendarEvent[];
 
+  // Fetch contacts for photo lookup
+  const contactIds = (meetingsData || [])
+    .map((m) => m.contact_id)
+    .filter((id): id is string => !!id);
+
+  const { data: contactsData } = contactIds.length > 0
+    ? await supabase
+        .from("itp_contacts")
+        .select("id, name, role, organization, photo_url")
+        .in("id", [...new Set(contactIds)])
+    : { data: [] };
+
+  const contactLookup = new Map(
+    (contactsData || []).map((c: { id: string; name: string; role?: string; organization?: string; photo_url?: string }) => [c.id, c])
+  );
+
   // Locations (skip housing — visitors don't need it)
   const { data: locationsData } = await supabase
     .from("itp_locations")
@@ -79,14 +95,19 @@ export default async function VisitorPage({ params }: Props) {
     (l) => l.category !== "housing"
   );
 
-  // Deduplicate contacts from visitor-specific meetings
-  const contactMap = new Map<string, string>();
+  // Deduplicate contacts from visitor-specific meetings (prefer itp_contacts data for photo)
+  const contactMap = new Map<string, { name: string; role: string; photo_url?: string }>();
   for (const e of (meetingsData || [])) {
-    if (e.contact_name) {
-      contactMap.set(e.contact_name, e.contact_role || "");
+    if (e.contact_id && contactLookup.has(e.contact_id)) {
+      const c = contactLookup.get(e.contact_id)!;
+      if (!contactMap.has(c.name)) {
+        contactMap.set(c.name, { name: c.name, role: c.role || "", photo_url: c.photo_url });
+      }
+    } else if (e.contact_name && !contactMap.has(e.contact_name)) {
+      contactMap.set(e.contact_name, { name: e.contact_name, role: e.contact_role || "" });
     }
   }
-  const contacts = Array.from(contactMap.entries()).map(([name, role]) => ({ name, role }));
+  const contacts = Array.from(contactMap.values());
 
   const visitRange = `${formatDate(visitor.visit_start_date)} – ${formatDate(visitor.visit_end_date)}`;
 
@@ -165,11 +186,19 @@ export default async function VisitorPage({ params }: Props) {
           <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
             {contacts.map((c) => (
               <div key={c.name} className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
-                  <span className="text-sm font-semibold text-[#ED1C24]">
-                    {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
-                  </span>
-                </div>
+                {c.photo_url ? (
+                  <img
+                    src={c.photo_url}
+                    alt={c.name}
+                    className="h-10 w-10 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
+                    <span className="text-sm font-semibold text-[#ED1C24]">
+                      {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-zinc-900 dark:text-zinc-100">{c.name}</p>
                   {c.role && (

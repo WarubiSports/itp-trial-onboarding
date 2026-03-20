@@ -75,6 +75,7 @@ export type CalendarEvent = {
   all_day: boolean;
   contact_name?: string;
   contact_role?: string;
+  contact_id?: string;
 };
 
 export type Visitor = {
