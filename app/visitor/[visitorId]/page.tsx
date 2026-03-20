@@ -5,6 +5,7 @@ import type { Visitor, CalendarEvent } from "@/lib/types";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { VisitorTravelForm } from "@/components/VisitorTravelForm";
 import { ContactsList } from "@/components/ContactsList";
+import { WeatherForecast } from "@/components/WeatherForecast";
 
 export const dynamic = "force-dynamic";
 
@@ -166,7 +167,9 @@ export default async function VisitorPage({ params }: Props) {
       {/* Your Contacts */}
       <ContactsList contacts={contacts} />
 
-      {/* Hotels */}
+      {/* Weather */}
+      <WeatherForecast startDate={visitor.visit_start_date} endDate={visitor.visit_end_date} />
+
       {/* WhatsApp Contact */}
       <section className="px-4 pb-8">
         <a
@@ -186,6 +189,34 @@ export default async function VisitorPage({ params }: Props) {
           </div>
           <span className="text-sm font-medium text-green-600 dark:text-green-400">→</span>
         </a>
+      </section>
+
+      {/* Emergency Info */}
+      <section className="px-4 pb-8">
+        <details className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+          <summary className="flex cursor-pointer items-center gap-3 p-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            🚨 Emergency Information
+          </summary>
+          <div className="space-y-3 border-t border-zinc-100 px-4 pb-4 pt-3 dark:border-zinc-700">
+            <div>
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Emergency Number</p>
+              <a href="tel:112" className="text-sm text-[#ED1C24] font-medium">112</a>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Police, Fire & Ambulance (free, works from any phone)</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Nearest Hospital</p>
+              <a href="https://maps.google.com/?q=St.+Franziskus+Hospital+Köln" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 dark:text-blue-400 underline">
+                St. Franziskus Hospital
+              </a>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Schönsteinstraße 63, 50825 Köln</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Your Contact</p>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300">Thomas Ellinger</p>
+              <a href="tel:+491602717912" className="text-sm text-blue-600 dark:text-blue-400 underline">+49 160 2717912</a>
+            </div>
+          </div>
+        </details>
       </section>
 
       <section className="px-4 pb-12">
