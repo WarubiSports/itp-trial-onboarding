@@ -80,7 +80,7 @@ export default async function VisitorPage({ params }: Props) {
   );
 
   // Deduplicate contacts from visitor-specific meetings (prefer itp_contacts data for photo)
-  const contactMap = new Map<string, { name: string; role: string; photo_url?: string }>();
+  const contactMap = new Map<string, { name: string; role: string; organization?: string; photo_url?: string }>();
   for (const e of (meetingsData || [])) {
     // Handle contact_ids array (new) and contact_id (legacy)
     const ids = (e.contact_ids && Array.isArray(e.contact_ids) && e.contact_ids.length > 0)
@@ -91,7 +91,7 @@ export default async function VisitorPage({ params }: Props) {
       if (contactLookup.has(id)) {
         const c = contactLookup.get(id)!;
         if (!contactMap.has(c.name)) {
-          contactMap.set(c.name, { name: c.name, role: c.role || "", photo_url: c.photo_url });
+          contactMap.set(c.name, { name: c.name, role: c.role || "", organization: c.organization, photo_url: c.photo_url });
         }
       }
     }
@@ -197,9 +197,9 @@ export default async function VisitorPage({ params }: Props) {
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-zinc-900 dark:text-zinc-100">{c.name}</p>
-                  {c.role && (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{c.role}</p>
-                  )}
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {[c.role, c.organization].filter(Boolean).join(" · ")}
+                  </p>
                 </div>
               </div>
             ))}

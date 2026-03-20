@@ -57,7 +57,6 @@ const isToday = (dateStr: string): boolean => {
 };
 
 const typeIcons: Record<string, string> = {
-  meeting: "🤝",
   team_training: "⚽",
   training: "⚽",
   individual_training: "🏋️",
@@ -68,10 +67,9 @@ const typeIcons: Record<string, string> = {
   medical: "🏥",
   airport_pickup: "✈️",
   team_activity: "👥",
-  other: "📋",
 };
 
-const getIcon = (type: string): string => typeIcons[type] || "📋";
+const getIcon = (type: string): string | null => typeIcons[type] || null;
 
 export const WeeklyCalendar = ({
   events,
@@ -199,7 +197,7 @@ export const WeeklyCalendar = ({
                           {/* Content */}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-start gap-2">
-                              <span className="text-base">{icon}</span>
+                              {icon && <span className="text-base">{icon}</span>}
                               <div className="min-w-0 flex-1">
                                 <p className="font-medium text-zinc-900 dark:text-zinc-100">
                                   {event.title}

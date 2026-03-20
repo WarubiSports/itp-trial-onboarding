@@ -25,10 +25,10 @@ const ARRIVAL_POINTS = [
 type PickupChoice = "airport" | "hotel" | "none";
 
 export const VisitorTravelForm = ({ visitorId, initial }: Props) => {
-  const initialPickup: PickupChoice = initial.needs_pickup === false
-    ? "none"
-    : initial.pickup_location
-      ? "hotel"
+  const initialPickup: PickupChoice = initial.needs_pickup === true
+    ? "hotel"
+    : initial.needs_pickup === false
+      ? "none"
       : "airport";
 
   const [form, setForm] = useState({
