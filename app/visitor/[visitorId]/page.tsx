@@ -183,9 +183,6 @@ export default async function VisitorPage({ params }: Props) {
             <p className="font-medium text-green-900 dark:text-green-100">
               Message Thomas on WhatsApp
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              Thomas Ellinger · Warubi Sports
-            </p>
           </div>
           <span className="text-sm font-medium text-green-600 dark:text-green-400">→</span>
         </a>
