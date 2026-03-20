@@ -75,6 +75,31 @@ export type CalendarEvent = {
   all_day: boolean;
 };
 
+export type Visitor = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  phone?: string;
+  organization?: string;
+  role: string;
+  visit_start_date: string;
+  visit_end_date: string;
+  purpose?: string;
+  notes?: string;
+  travel_arrangements?: string;
+  arrival_date?: string;
+  arrival_time?: string;
+  flight_number?: string;
+  arrival_airport?: string;
+  needs_pickup?: boolean;
+  pickup_location?: string;
+  whatsapp_number?: string;
+  travel_submitted_at?: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type LocationCategory =
   | "housing"
   | "training"
