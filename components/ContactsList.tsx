@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 type Contact = {
   name: string;
@@ -36,7 +37,7 @@ export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
               <button
                 type="button"
                 onClick={() => setExpanded(isExpanded ? null : c.name)}
-                className="flex w-full items-center gap-3 p-4 text-left transition-colors active:bg-zinc-50 dark:active:bg-zinc-700/50"
+                className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-zinc-50 active:bg-zinc-100 dark:hover:bg-zinc-700/30 dark:active:bg-zinc-700/50"
               >
                 {c.photo_url ? (
                   <img
@@ -59,6 +60,12 @@ export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
                     {[c.role, c.organization].filter(Boolean).join(" · ")}
                   </p>
                 </div>
+                {c.photo_url && (
+                  <ChevronDown
+                    size={18}
+                    className={`shrink-0 text-zinc-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                  />
+                )}
               </button>
 
               {/* Expanded full photo */}
