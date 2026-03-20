@@ -40,11 +40,13 @@ export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
                 className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-zinc-50 active:bg-zinc-100 dark:hover:bg-zinc-700/30 dark:active:bg-zinc-700/50"
               >
                 {c.photo_url ? (
-                  <img
-                    src={c.photo_url}
-                    alt={c.name}
-                    className="h-10 w-10 shrink-0 rounded-full object-cover object-top"
-                  />
+                  <div className="relative shrink-0">
+                    <img
+                      src={c.photo_url}
+                      alt={c.name}
+                      className="h-10 w-10 rounded-full object-cover object-top ring-2 ring-[#ED1C24]/20"
+                    />
+                  </div>
                 ) : (
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
                     <span className="text-sm font-semibold text-[#ED1C24]">
@@ -59,13 +61,14 @@ export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     {[c.role, c.organization].filter(Boolean).join(" · ")}
                   </p>
+                  {c.photo_url && !isExpanded && (
+                    <p className="text-xs text-[#ED1C24]/60 mt-0.5">Tap to view photo</p>
+                  )}
                 </div>
-                {c.photo_url && (
-                  <ChevronDown
-                    size={18}
-                    className={`shrink-0 text-zinc-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                  />
-                )}
+                <ChevronDown
+                  size={18}
+                  className={`shrink-0 text-zinc-300 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                />
               </button>
 
               {/* Expanded full photo */}
