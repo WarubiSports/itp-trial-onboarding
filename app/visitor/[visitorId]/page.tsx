@@ -173,7 +173,7 @@ export default async function VisitorPage({ params }: Props) {
       {/* WhatsApp Contact */}
       <section className="px-4 pb-8">
         <a
-          href="https://wa.me/491602717912?text=Hi%20Thomas%2C%20I%27m%20visiting%20the%201.%20FC%20K%C3%B6ln%20ITP%20and%20have%20a%20question."
+          href={`https://wa.me/491602717912?text=${encodeURIComponent(`Hi Thomas, I'm ${visitor.first_name} ${visitor.last_name} and excited to visit the 1.FC Köln ITP. I have a couple of questions:`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 transition-colors active:bg-green-100 dark:border-green-800 dark:bg-green-950/40 dark:active:bg-green-900/40"
