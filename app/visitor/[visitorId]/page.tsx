@@ -167,6 +167,27 @@ export default async function VisitorPage({ params }: Props) {
       <ContactsList contacts={contacts} />
 
       {/* Hotels */}
+      {/* WhatsApp Contact */}
+      <section className="px-4 pb-8">
+        <a
+          href="https://wa.me/491602717912?text=Hi%20Thomas%2C%20I%27m%20visiting%20the%201.%20FC%20K%C3%B6ln%20ITP%20and%20have%20a%20question."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 p-4 transition-colors active:bg-green-100 dark:border-green-800 dark:bg-green-950/40 dark:active:bg-green-900/40"
+        >
+          <span className="text-2xl">💬</span>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-green-900 dark:text-green-100">
+              Message Thomas on WhatsApp
+            </p>
+            <p className="text-sm text-green-700 dark:text-green-300">
+              Thomas Ellinger · Warubi Sports
+            </p>
+          </div>
+          <span className="text-sm font-medium text-green-600 dark:text-green-400">→</span>
+        </a>
+      </section>
+
       <section className="px-4 pb-12">
         <h2 className="mb-1 text-lg font-bold text-[#ED1C24]">
           Your Hotel Options
