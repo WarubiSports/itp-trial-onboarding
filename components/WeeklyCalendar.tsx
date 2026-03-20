@@ -177,6 +177,16 @@ export const WeeklyCalendar = ({
                               <> &middot; {event.location}</>
                             )}
                           </p>
+                          {event.contact_name && (
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                              with {event.contact_name}
+                              {event.contact_role && (
+                                <span className="text-zinc-400 dark:text-zinc-500">
+                                  {" "}({event.contact_role})
+                                </span>
+                              )}
+                            </p>
+                          )}
                         </div>
                       </div>
                     );

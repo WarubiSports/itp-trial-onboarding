@@ -79,6 +79,15 @@ export default async function VisitorPage({ params }: Props) {
     (l) => l.category !== "housing"
   );
 
+  // Deduplicate contacts from visitor-specific meetings
+  const contactMap = new Map<string, string>();
+  for (const e of (meetingsData || [])) {
+    if (e.contact_name) {
+      contactMap.set(e.contact_name, e.contact_role || "");
+    }
+  }
+  const contacts = Array.from(contactMap.entries()).map(([name, role]) => ({ name, role }));
+
   const visitRange = `${formatDate(visitor.visit_start_date)} – ${formatDate(visitor.visit_end_date)}`;
 
   return (
@@ -146,6 +155,32 @@ export default async function VisitorPage({ params }: Props) {
         startDate={visitor.visit_start_date}
         endDate={visitor.visit_end_date}
       />
+
+      {/* Your Contacts */}
+      {contacts.length > 0 && (
+        <section className="px-4 pb-8">
+          <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+            Your Contacts
+          </h2>
+          <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
+            {contacts.map((c) => (
+              <div key={c.name} className="flex items-center gap-3 p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
+                  <span className="text-sm font-semibold text-[#ED1C24]">
+                    {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-zinc-900 dark:text-zinc-100">{c.name}</p>
+                  {c.role && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{c.role}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Locations (no housing) */}
       <LocationsList locations={locations} />

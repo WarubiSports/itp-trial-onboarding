@@ -73,6 +73,8 @@ export type CalendarEvent = {
   type: string;
   location?: string;
   all_day: boolean;
+  contact_name?: string;
+  contact_role?: string;
 };
 
 export type Visitor = {
