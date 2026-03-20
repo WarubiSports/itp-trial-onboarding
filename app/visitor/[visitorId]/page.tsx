@@ -121,7 +121,9 @@ export default async function VisitorPage({ params }: Props) {
   }
   const contacts = Array.from(contactMap.values());
 
-  const visitRange = `${formatDate(visitor.visit_start_date)} – ${formatDate(visitor.visit_end_date)}`;
+  const visitRange = visitor.visit_start_date === visitor.visit_end_date
+    ? formatDate(visitor.visit_start_date)
+    : `${formatDate(visitor.visit_start_date)} – ${formatDate(visitor.visit_end_date)}`;
 
   return (
     <main className="mx-auto min-h-screen max-w-lg pb-safe">
