@@ -62,16 +62,16 @@ export default async function VisitorPage({ params }: Props) {
   const { data: contactsData } = contactIds.length > 0
     ? await supabase
         .from("itp_contacts")
-        .select("id, name, role, organization, photo_url")
+        .select("id, name, role, organization, photo_url, nationality")
         .in("id", [...new Set(contactIds)])
     : { data: [] };
 
   const contactLookup = new Map(
-    (contactsData || []).map((c: { id: string; name: string; role?: string; organization?: string; photo_url?: string }) => [c.id, c])
+    (contactsData || []).map((c: { id: string; name: string; role?: string; organization?: string; photo_url?: string; nationality?: string }) => [c.id, c])
   );
 
   // Deduplicate contacts from visitor-specific meetings (prefer itp_contacts data for photo)
-  const contactMap = new Map<string, { name: string; role: string; organization?: string; photo_url?: string }>();
+  const contactMap = new Map<string, { name: string; role: string; organization?: string; photo_url?: string; nationality?: string }>();
   for (const e of (meetingsData || [])) {
     // Handle contact_ids array (new) and contact_id (legacy)
     const ids = (e.contact_ids && Array.isArray(e.contact_ids) && e.contact_ids.length > 0)
@@ -82,7 +82,7 @@ export default async function VisitorPage({ params }: Props) {
       if (contactLookup.has(id)) {
         const c = contactLookup.get(id)!;
         if (!contactMap.has(c.name)) {
-          contactMap.set(c.name, { name: c.name, role: c.role || "", organization: c.organization, photo_url: c.photo_url });
+          contactMap.set(c.name, { name: c.name, role: c.role || "", organization: c.organization, photo_url: c.photo_url, nationality: c.nationality });
         }
       }
     }

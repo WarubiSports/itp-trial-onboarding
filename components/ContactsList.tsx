@@ -7,6 +7,14 @@ type Contact = {
   role: string;
   organization?: string;
   photo_url?: string;
+  nationality?: string;
+};
+
+const countryFlags: Record<string, string> = {
+  DE: "🇩🇪", MX: "🇲🇽", US: "🇺🇸", GB: "🇬🇧", FR: "🇫🇷", ES: "🇪🇸",
+  IT: "🇮🇹", BR: "🇧🇷", AR: "🇦🇷", NL: "🇳🇱", PT: "🇵🇹", JP: "🇯🇵",
+  KR: "🇰🇷", AU: "🇦🇺", CA: "🇨🇦", AT: "🇦🇹", CH: "🇨🇭", BE: "🇧🇪",
+  CO: "🇨🇴", CL: "🇨🇱", PE: "🇵🇪", IE: "🇮🇪", NG: "🇳🇬", GH: "🇬🇭",
 };
 
 export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
@@ -44,7 +52,9 @@ export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-zinc-900 dark:text-zinc-100">{c.name}</p>
+                  <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                    {c.name} {c.nationality && countryFlags[c.nationality] ? countryFlags[c.nationality] : ""}
+                  </p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     {[c.role, c.organization].filter(Boolean).join(" · ")}
                   </p>
