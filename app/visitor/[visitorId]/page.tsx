@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import type { Visitor, CalendarEvent, ITPLocation } from "@/lib/types";
+import type { Visitor, CalendarEvent } from "@/lib/types";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
-import { LocationsList } from "@/components/LocationsList";
 import { VisitorTravelForm } from "@/components/VisitorTravelForm";
 import { ContactsList } from "@/components/ContactsList";
 
@@ -68,16 +67,6 @@ export default async function VisitorPage({ params }: Props) {
 
   const contactLookup = new Map(
     (contactsData || []).map((c: { id: string; name: string; role?: string; organization?: string; photo_url?: string }) => [c.id, c])
-  );
-
-  // Locations (skip housing — visitors don't need it)
-  const { data: locationsData } = await supabase
-    .from("itp_locations")
-    .select("*")
-    .eq("itp_site", "Köln");
-
-  const locations = ((locationsData || []) as ITPLocation[]).filter(
-    (l) => l.category !== "housing"
   );
 
   // Deduplicate contacts from visitor-specific meetings (prefer itp_contacts data for photo)
@@ -176,9 +165,6 @@ export default async function VisitorPage({ params }: Props) {
 
       {/* Your Contacts */}
       <ContactsList contacts={contacts} />
-
-      {/* Locations (no housing) */}
-      <LocationsList locations={locations} />
 
       {/* Hotels */}
       <section className="px-4 pb-12">
