@@ -4,6 +4,8 @@ import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { LocationsList } from "@/components/LocationsList";
 import { HousingRequest } from "@/components/HousingRequest";
 import { TravelForm } from "@/components/TravelForm";
+import { ContactsList } from "@/components/ContactsList";
+import { WeatherForecast } from "@/components/WeatherForecast";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +80,21 @@ export default async function PlayerPage({ params }: Props) {
   let housingAvailability: { house_name: string; available: number; total_beds: number }[] = [];
   let totalAvailable = 0;
   const alreadyRequestedHousing = !player.room_id && player.accommodation_type === "house";
+
+  // Fetch ITP staff contacts
+  const { data: staffContacts } = await supabase
+    .from("itp_contacts")
+    .select("name, role, organization, photo_url, nationality")
+    .in("role", ["Project Manager", "Head of Player Development"])
+    .order("name");
+
+  const contacts = (staffContacts || []).map((c: { name: string; role?: string; organization?: string; photo_url?: string; nationality?: string }) => ({
+    name: c.name,
+    role: c.role || "",
+    organization: c.organization,
+    photo_url: c.photo_url,
+    nationality: c.nationality,
+  }));
 
   if (!player.room_id && startDate && endDate) {
     const [{ data: allHouses }, { data: allRooms }, { data: activePlayers }, { data: upcomingTrialists }] =
@@ -215,6 +232,60 @@ export default async function PlayerPage({ params }: Props) {
             housingStatus={player.housing_status}
             accommodationNotes={player.accommodation_notes}
           />
+        </section>
+      )}
+
+      {/* Your Contacts */}
+      <ContactsList contacts={contacts} />
+
+      {/* Good to Know */}
+      {startDate && endDate && (
+        <section className="px-4 pb-8">
+          <h2 className="mb-3 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+            Good to Know
+          </h2>
+          <div className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:divide-zinc-700">
+            {/* Weather */}
+            <WeatherForecast startDate={startDate} endDate={endDate} />
+
+            {/* WhatsApp */}
+            <a
+              href={`https://wa.me/491602717912?text=${encodeURIComponent(`Hi Thomas, I'm ${player.first_name} ${player.last_name} and I'm coming for a trial at the 1.FC Köln ITP. I have a question:`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-4 transition-colors active:bg-zinc-50 dark:active:bg-zinc-700/50"
+            >
+              <span className="text-lg">💬</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Message Thomas on WhatsApp</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Questions? We&apos;re happy to help.</p>
+              </div>
+              <span className="text-sm text-zinc-400">→</span>
+            </a>
+
+            {/* Emergency */}
+            <details>
+              <summary className="flex cursor-pointer items-center gap-3 p-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <span className="text-lg">🚨</span>
+                <span className="flex-1">Emergency Information</span>
+                <span className="text-xs text-zinc-400">Tap to expand</span>
+              </summary>
+              <div className="space-y-2 px-4 pb-4 pt-1 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-500 dark:text-zinc-400">Emergency</span>
+                  <a href="tel:112" className="font-medium text-[#ED1C24]">112</a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-500 dark:text-zinc-400">Hospital</span>
+                  <a href="https://maps.google.com/?q=St.+Franziskus+Hospital+Köln" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">St. Franziskus</a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-500 dark:text-zinc-400">Thomas</span>
+                  <a href="tel:+491602717912" className="text-blue-600 dark:text-blue-400 underline">+49 160 2717912</a>
+                </div>
+              </div>
+            </details>
+          </div>
         </section>
       )}
 
