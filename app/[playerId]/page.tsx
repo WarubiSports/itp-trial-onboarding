@@ -6,6 +6,7 @@ import { TravelForm } from "@/components/TravelForm";
 import { ContactsList } from "@/components/ContactsList";
 import { WeatherForecast } from "@/components/WeatherForecast";
 import { DocumentStatus } from "@/components/DocumentStatus";
+import { PaymentSection } from "@/components/PaymentSection";
 
 export const dynamic = "force-dynamic";
 
@@ -134,6 +135,11 @@ export default async function PlayerPage({ params }: Props) {
         </section>
       )}
       <DocumentStatus signedDocs={signedDocs} playerId={playerId} />
+      <PaymentSection
+        paymentLink={player.payment_link}
+        paymentAmount={player.payment_amount}
+        paymentStatus={player.payment_status}
+      />
       <TravelForm
         prospectId={playerId}
         initial={player.travel_submitted_at ? {
