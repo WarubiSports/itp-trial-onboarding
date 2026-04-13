@@ -41,23 +41,26 @@ export default async function PlayerLayout({ params, children }: Props) {
   const showOnboarding = ['accepted', 'placed'].includes(player.status) || !!player.onboarding_completed_at;
 
   return (
-    <main className="mx-auto min-h-screen max-w-lg pb-safe">
-      <WelcomeHeader prospect={player} scoutInfo={scoutInfo} />
-      {showOnboarding ? (
-        <>
-          <TabNav playerId={playerId} completed={!!player.onboarding_completed_at} />
-          <section className="px-4 pb-4">
-            <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/40">
-              <span className="text-lg">📅</span>
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                <span className="font-semibold">Preseason starts July 6, 2026.</span>{" "}
-                Please complete your onboarding before then.
-              </p>
-            </div>
-          </section>
-        </>
-      ) : null}
-      {children}
-    </main>
+    <div className="min-h-screen flex flex-col items-center">
+      {/* Desktop: centered card with shadow and subtle border */}
+      <main className="w-full max-w-[540px] min-h-screen lg:min-h-0 lg:my-8 lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl lg:shadow-black/40 lg:overflow-hidden">
+        <WelcomeHeader prospect={player} scoutInfo={scoutInfo} />
+        {showOnboarding ? (
+          <>
+            <TabNav playerId={playerId} completed={!!player.onboarding_completed_at} />
+            <section className="px-4 pb-4">
+              <div className="flex items-center gap-3 rounded-xl border border-blue-700/30 bg-blue-900/20 p-4">
+                <span className="text-lg">📅</span>
+                <p className="text-sm text-blue-300">
+                  <span className="font-semibold">Preseason starts July 6, 2026.</span>{" "}
+                  Please complete your onboarding before then.
+                </p>
+              </div>
+            </section>
+          </>
+        ) : null}
+        {children}
+      </main>
+    </div>
   );
 }
