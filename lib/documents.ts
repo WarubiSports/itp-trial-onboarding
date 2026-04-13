@@ -62,21 +62,4 @@ export const DOCUMENT_CONTENT: Record<string, { title: string; sections: { headi
       },
     ],
   },
-  medical_consent: {
-    title: 'Medical Treatment Consent',
-    sections: [
-      {
-        heading: 'Consent to Treatment',
-        body: 'In the event of illness, injury, or medical emergency during the ITP trial program, I authorize 1. FC Köln and Warubi Sports staff to arrange necessary medical treatment on my behalf. This includes, but is not limited to, first aid, ambulance transport, emergency room visits, and consultation with medical professionals. If I am unable to give consent at the time of treatment (e.g., due to unconsciousness), I authorize program staff to make medical decisions in my best interest until my emergency contact can be reached.',
-      },
-      {
-        heading: 'Medical Information Sharing',
-        body: 'I consent to the sharing of relevant medical information — including pre-existing conditions, allergies, medications, and injury history — with coaching staff, team physiotherapists, and medical professionals involved in my care during the trial. This information will be treated confidentially and used solely for the purpose of ensuring my health and safety. I agree to disclose all relevant medical conditions on my player registration form prior to the start of the trial.',
-      },
-      {
-        heading: 'Emergency Contact',
-        body: 'I confirm that the emergency contact information provided in my player registration is accurate and up to date. I understand that program staff will attempt to contact my designated emergency contact as soon as reasonably possible in the event of a medical emergency. I accept responsibility for ensuring my emergency contact is reachable during the duration of the trial and for notifying program staff immediately of any changes to this information.',
-      },
-    ],
-  },
 }

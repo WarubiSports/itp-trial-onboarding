@@ -151,19 +151,14 @@ export default async function PlayerPage({ params }: Props) {
           pickup_location: player.pickup_location,
           whatsapp_number: player.whatsapp_number,
         } : {}}
-        firstActivity={!player.travel_arrangements && player.arrival_date ? (() => {
-          const firstEvent = events.find(e => e.date >= player.arrival_date!)
-          if (!firstEvent) return undefined
-          const dayName = new Date(firstEvent.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
-          const matched = firstEvent.location
-            ? locations.find(l => firstEvent.location!.toLowerCase().includes(l.name.split(' ').pop()!.toLowerCase()) || l.name.toLowerCase().includes(firstEvent.location!.toLowerCase()))
-            : null
+        firstActivity={!player.travel_arrangements ? (() => {
+          const training = locations.find(l => l.category === 'training')
           return {
-            title: firstEvent.title,
-            day: dayName,
-            location: matched?.name || firstEvent.location || 'the training facility',
-            address: matched?.address,
-            mapsUrl: matched?.maps_url || undefined,
+            title: 'Team Training',
+            day: 'your first day',
+            location: training?.name || 'Sportpark Widdersdorf',
+            address: training?.address,
+            mapsUrl: training?.maps_url || undefined,
           }
         })() : undefined}
       />
