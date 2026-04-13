@@ -38,7 +38,7 @@ export default async function PlayerLayout({ params, children }: Props) {
   }
 
   // Only show onboarding tab for committed players
-  const showOnboarding = ['accepted', 'placed'].includes(player.status) || !!player.onboarding_completed_at;
+  const showOnboarding = ['scheduled', 'accepted', 'placed'].includes(player.status) || !!player.onboarding_completed_at;
 
   return (
     <div className="min-h-screen flex flex-col items-center">
