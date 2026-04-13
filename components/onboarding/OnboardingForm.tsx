@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import type { TrialProspect } from "@/lib/types";
 import { FileUpload } from "./FileUpload";
+import { DocumentsList } from "@/components/DocumentsList";
+import { DOCUMENT_CONTENT } from "@/lib/documents";
 import {
   Plane,
   Shirt,
@@ -12,6 +14,7 @@ import {
   ChevronRight,
   ChevronLeft,
   Loader2,
+  PenTool,
 } from "lucide-react";
 
 type Props = {
@@ -42,12 +45,36 @@ type FormState = {
 
 const STORAGE_KEY = (id: string) => `onboarding_${id}`;
 
+const REQUIRED_DOCS = Object.entries(DOCUMENT_CONTENT).map(([type, doc]) => ({
+  type,
+  title: doc.title,
+}));
+
 export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
-  const totalSteps = isUnder18 ? 5 : 4;
+  const totalSteps = isUnder18 ? 6 : 5;
   const [step, setStep] = useState(prospect.onboarding_step || 1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(!!prospect.onboarding_completed_at);
   const [error, setError] = useState("");
+
+  // Document signing state
+  const [signedDocs, setSignedDocs] = useState<{ document_type: string; signed_at: string; signer_name: string }[]>([]);
+
+  const fetchSignedDocs = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/documents?player_id=${prospect.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSignedDocs(data);
+      }
+    } catch {
+      // silent — docs will show as unsigned
+    }
+  }, [prospect.id]);
+
+  useEffect(() => {
+    fetchSignedDocs();
+  }, [fetchSignedDocs]);
 
   // File upload state
   const [passportPath, setPassportPath] = useState(prospect.passport_file_path || "");
@@ -127,17 +154,24 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
 
   const validateStep = (currentStep: number): string | null => {
     switch (currentStep) {
-      case 1:
-        return null; // Travel is optional — can be skipped
+      case 1: {
+        const allSigned = REQUIRED_DOCS.every((d) =>
+          signedDocs.some((s) => s.document_type === d.type)
+        );
+        if (!allSigned) return "Please sign all documents before continuing";
+        return null;
+      }
       case 2:
+        return null; // Travel is optional — can be skipped
+      case 3:
         if (!form.equipment_size) return "Please select your equipment size";
         if (form.schengen_last_180_days === null) return "Please answer the Schengen question";
         return null;
-      case 3:
+      case 4:
         if (!passportPath) return "Please upload your passport";
         if (isUnder18 && !parent1PassportPath) return "Please upload Parent 1 passport";
         return null;
-      case 4:
+      case 5:
         if (isUnder18) {
           if (!vollmachtPath) return "Please upload the signed Vollmacht";
           if (!wellpassPath) return "Please upload the signed Wellpass Consent";
@@ -213,26 +247,41 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
 
   // Step indicators
   const stepLabels = isUnder18
-    ? ["Travel", "Equipment", "Documents", "U18 Forms", "Confirm"]
-    : ["Travel", "Equipment", "Documents", "Confirm"];
+    ? ["Sign", "Travel", "Equipment", "Documents", "U18 Forms", "Confirm"]
+    : ["Sign", "Travel", "Equipment", "Documents", "Confirm"];
 
   const stepIcons = isUnder18
-    ? [Plane, Shirt, FileText, ShieldCheck, CheckCircle2]
-    : [Plane, Shirt, FileText, CheckCircle2];
+    ? [PenTool, Plane, Shirt, FileText, ShieldCheck, CheckCircle2]
+    : [PenTool, Plane, Shirt, FileText, CheckCircle2];
 
   // Determine which step content to render
-  // For non-U18, skip step 4 (U18 Forms)
   const getStepContent = () => {
-    if (!isUnder18 && step === 4) return renderConfirm();
+    if (!isUnder18 && step === 5) return renderConfirm();
     switch (step) {
-      case 1: return renderTravel();
-      case 2: return renderEquipment();
-      case 3: return renderDocuments();
-      case 4: return renderU18Forms();
-      case 5: return renderConfirm();
+      case 1: return renderSignDocuments();
+      case 2: return renderTravel();
+      case 3: return renderEquipment();
+      case 4: return renderDocuments();
+      case 5: return renderU18Forms();
+      case 6: return renderConfirm();
       default: return null;
     }
   };
+
+  const renderSignDocuments = () => (
+    <div>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+        Please read and sign each document to continue.
+      </p>
+      <DocumentsList
+        playerId={prospect.id}
+        requiredDocs={REQUIRED_DOCS}
+        signedDocs={signedDocs}
+        isMinor={isUnder18}
+        onDocSigned={fetchSignedDocs}
+      />
+    </div>
+  );
 
   const renderTravel = () => (
     <div className="space-y-4">
@@ -578,7 +627,7 @@ export const OnboardingForm = ({ prospect, isUnder18 }: Props) => {
       )}
 
       {/* Navigation */}
-      {step === 1 && (
+      {step === 2 && (
         <button
           type="button"
           onClick={nextStep}
