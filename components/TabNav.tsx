@@ -22,7 +22,7 @@ export const TabNav = ({
       active: !isOnboarding,
     },
     {
-      label: completed ? "Onboarding ✓" : "Onboarding",
+      label: completed ? "Onboarding \u2713" : "Onboarding",
       href: `/${playerId}/onboarding`,
       icon: ClipboardCheck,
       active: isOnboarding,
@@ -30,17 +30,17 @@ export const TabNav = ({
   ];
 
   return (
-    <nav className="mx-4 mb-6 flex gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 dark:border-zinc-700 dark:bg-zinc-800">
+    <nav className="mx-4 mb-6 flex gap-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-lg p-1">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         return (
           <Link
             key={tab.href}
             href={tab.href}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
               tab.active
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "bg-[var(--color-surface-elevated)] text-[var(--color-text)] shadow-sm shadow-[var(--color-brand-glow)]"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
             }`}
           >
             <Icon size={16} />
