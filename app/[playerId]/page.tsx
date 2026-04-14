@@ -150,6 +150,7 @@ export default async function PlayerPage({ params }: Props) {
       />
       <TravelForm
         prospectId={playerId}
+        submittedAt={player.travel_submitted_at}
         initial={player.travel_submitted_at ? {
           arrival_date: player.arrival_date,
           arrival_time: player.arrival_time,
