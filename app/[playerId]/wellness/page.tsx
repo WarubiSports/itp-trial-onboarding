@@ -30,6 +30,12 @@ export default async function WellnessPage({ params }: Props) {
 
   if (!resolved) notFound();
 
+  // Alumni are no longer active — send them to the alumni info page.
+  if (resolved.source === "player" && (resolved.raw as { status?: string }).status === "alumni") {
+    const { redirect } = await import("next/navigation");
+    redirect(`/${urlId}`);
+  }
+
   // Wellness is only available to in-program players.
   if (resolved.source !== "player") {
     return (

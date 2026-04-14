@@ -37,6 +37,11 @@ export default async function ChoresPage({ params }: Props) {
 
   if (!resolved) notFound();
 
+  if (resolved.source === "player" && (resolved.raw as { status?: string }).status === "alumni") {
+    const { redirect } = await import("next/navigation");
+    redirect(`/${urlId}`);
+  }
+
   if (resolved.source !== "player") {
     return (
       <div className="py-12 px-4 text-center">

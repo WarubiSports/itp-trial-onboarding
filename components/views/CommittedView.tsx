@@ -7,6 +7,7 @@ import { ContactsList } from "@/components/ContactsList";
 import { LocationsList } from "@/components/LocationsList";
 import { FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { sortContacts, STAFF_LOCATION_NAMES } from "@/lib/sortContacts";
+import { ageAtPreseason, formatPreseasonStart } from "@/lib/programCalendar";
 
 type Props = {
   prospect: TrialProspect;
@@ -115,13 +116,8 @@ export const CommittedView = async ({ prospect }: Props) => {
     })
   );
 
-  // Age-at-preseason calc for U18 detection (preseason Jul 6)
-  const dob = new Date(prospect.date_of_birth);
-  const preseasonStart = new Date(`${new Date().getFullYear()}-07-06`);
-  const ageAtPreseason = Math.floor(
-    (preseasonStart.getTime() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
-  );
-  const isUnder18 = ageAtPreseason < 18;
+  // U18 at preseason start — drives which upload items are required.
+  const isUnder18 = ageAtPreseason(prospect.date_of_birth) < 18;
 
   const passportUploaded = !!prospect.passport_file_path;
   const parent1PassportUploaded = !!prospect.parent1_passport_file_path;
@@ -151,7 +147,7 @@ export const CommittedView = async ({ prospect }: Props) => {
             You&apos;re in. Welcome to the ITP.
           </p>
           <p className="text-sm text-green-300/80 mt-1">
-            Here&apos;s what&apos;s left to complete before preseason on July 6, 2026.
+            Here&apos;s what&apos;s left to complete before preseason on {formatPreseasonStart()}.
           </p>
         </div>
       </section>

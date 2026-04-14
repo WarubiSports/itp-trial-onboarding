@@ -9,6 +9,7 @@ import { DocumentStatus } from "@/components/DocumentStatus";
 import { PaymentSection } from "@/components/PaymentSection";
 import { ProgramView } from "@/components/views/ProgramView";
 import { CommittedView } from "@/components/views/CommittedView";
+import { AlumniView } from "@/components/views/AlumniView";
 import { resolvePlayer, derivePhase } from "@/lib/resolvePlayer";
 import { sortContacts, STAFF_LOCATION_NAMES } from "@/lib/sortContacts";
 import { notFound } from "next/navigation";
@@ -29,6 +30,15 @@ export default async function PlayerPage({ params }: Props) {
   const phase = derivePhase(resolved);
 
   if (phase === "in-program") {
+    const rawPlayer = resolved.raw as { status?: string; alumni_destination?: string | null };
+    if (rawPlayer.status === "alumni") {
+      return (
+        <AlumniView
+          player={resolved.data}
+          alumniDestination={rawPlayer.alumni_destination ?? null}
+        />
+      );
+    }
     return <ProgramView player={resolved.data} />;
   }
 
