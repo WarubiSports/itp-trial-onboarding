@@ -152,7 +152,9 @@ export const TravelForm = ({ prospectId, initial, firstActivity, submittedAt }: 
             <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-900/20 border border-green-700/30 px-3 py-2">
               <CheckCircle2 size={16} className="text-green-400 shrink-0" />
               <p className="text-sm text-green-300">
-                Travel details submitted. We&apos;ve got you covered.
+                {form.needs_pickup
+                  ? "Travel details submitted. We'll pick you up."
+                  : "Travel details submitted. See you at the academy."}
               </p>
             </div>
 
