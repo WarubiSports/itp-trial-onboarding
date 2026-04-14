@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { X } from "lucide-react";
 
 type Contact = {
   name: string;
@@ -19,71 +19,90 @@ const countryFlags: Record<string, string> = {
 };
 
 export const ContactsList = ({ contacts }: { contacts: Contact[] }) => {
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<Contact | null>(null);
 
   if (contacts.length === 0) return null;
 
   return (
-    <section className="px-4 pb-8">
-      <h2 className="mb-4 text-lg font-bold text-[var(--color-text)] font-[family-name:var(--font-outfit)]">
-        Your Contacts
-      </h2>
-      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] divide-y divide-[var(--color-border)]">
-        {contacts.map((c) => {
-          const isExpanded = expanded === c.name;
-
-          return (
-            <div key={c.name}>
-              <button
-                type="button"
-                onClick={() => setExpanded(isExpanded ? null : c.name)}
-                className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-[var(--color-surface-elevated)] active:bg-[var(--color-surface-elevated)]"
-              >
-                {c.photo_url ? (
-                  <div className="relative shrink-0">
-                    <img
-                      src={c.photo_url}
-                      alt={c.name}
-                      className="h-10 w-10 rounded-full object-cover object-top ring-2 ring-[var(--color-brand)]/20"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-glow)]">
-                    <span className="text-sm font-semibold text-[var(--color-brand)]">
-                      {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-[var(--color-text)]">
-                    {c.name} {c.nationality && countryFlags[c.nationality] ? countryFlags[c.nationality] : ""}
-                  </p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">
-                    {[c.role, c.organization].filter(Boolean).join(" \u00B7 ")}
-                  </p>
-                  {c.photo_url && !isExpanded && (
-                    <p className="text-xs text-[var(--color-brand)]/60 mt-0.5">Tap to view photo</p>
-                  )}
-                </div>
-                <ChevronDown
-                  size={18}
-                  className={`shrink-0 text-[var(--color-text-muted)] transition-transform ${isExpanded ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {isExpanded && c.photo_url && (
-                <div className="px-4 pb-4">
+    <>
+      <section className="px-4 pb-8">
+        <h2 className="mb-4 text-lg font-bold text-[var(--color-text)] font-[family-name:var(--font-outfit)]">
+          Your Contacts
+        </h2>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] divide-y divide-[var(--color-border)]">
+          {contacts.map((c) => (
+            <div key={c.name} className="flex items-center gap-3 p-4">
+              {c.photo_url ? (
+                <button
+                  type="button"
+                  onClick={() => setLightbox(c)}
+                  className="shrink-0 group relative"
+                  aria-label={`View photo of ${c.name}`}
+                >
                   <img
                     src={c.photo_url}
                     alt={c.name}
-                    className="w-full rounded-xl object-cover"
+                    className="h-10 w-10 rounded-full object-cover object-top ring-2 ring-[var(--color-brand)]/20 transition-all group-hover:ring-[var(--color-brand)] group-hover:scale-110"
                   />
+                </button>
+              ) : (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-glow)]">
+                  <span className="text-sm font-semibold text-[var(--color-brand)]">
+                    {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                  </span>
                 </div>
               )}
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-[var(--color-text)]">
+                  {c.name} {c.nationality && countryFlags[c.nationality] ? countryFlags[c.nationality] : ""}
+                </p>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  {[c.role, c.organization].filter(Boolean).join(" \u00B7 ")}
+                </p>
+                {c.photo_url && (
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(c)}
+                    className="text-xs text-[var(--color-brand)]/70 hover:text-[var(--color-brand)] mt-0.5 transition-colors"
+                  >
+                    Tap to view photo
+                  </button>
+                )}
+              </div>
             </div>
-          );
-        })}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+
+      {/* Lightbox */}
+      {lightbox && lightbox.photo_url && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Close photo"
+          >
+            <X size={20} />
+          </button>
+          <div className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightbox.photo_url}
+              alt={lightbox.name}
+              className="w-full rounded-2xl object-cover shadow-2xl"
+            />
+            <div className="mt-4 text-center">
+              <p className="text-white font-semibold text-lg">{lightbox.name}</p>
+              <p className="text-white/70 text-sm">
+                {[lightbox.role, lightbox.organization].filter(Boolean).join(" \u00B7 ")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
