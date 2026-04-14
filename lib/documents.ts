@@ -22,7 +22,7 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       },
       {
         heading: 'Insurance',
-        body: 'I confirm that I either (a) hold valid health and accident insurance covering my stay in Germany for the full duration of the trial, or (b) am enrolled in the insurance coverage provided through the ITP program. I understand that I am responsible for any medical costs not covered by my insurance. If arranging my own insurance, I will provide proof of coverage prior to the start of the trial.',
+        body: 'For stays of one month or longer, Warubi Sports arranges health and accident insurance coverage for the full duration of the trial. For stays shorter than one month, I am responsible for holding my own valid health and accident insurance covering my stay in Germany and will provide proof of coverage prior to the start of the trial. In either case, I understand that I am responsible for any medical costs not covered by the applicable insurance.',
       },
       {
         heading: 'Acknowledgement',
@@ -74,6 +74,24 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       },
     ],
   },
+  medical_consent: {
+    title: 'Medical Treatment Consent',
+    phases: ['trial', 'program'],
+    sections: [
+      {
+        heading: 'Consent to Treatment',
+        body: 'In the event of illness, injury, or medical emergency during my participation in the 1. FC Köln International Talent Pathway (ITP), I authorize 1. FC Köln and Warubi Sports staff to arrange necessary medical treatment on my behalf. This includes, but is not limited to, first aid, ambulance transport, emergency room visits, and consultation with medical professionals. If I am unable to give consent at the time of treatment (e.g., due to unconsciousness), I authorize program staff to make medical decisions in my best interest until my emergency contact can be reached. If I am under 18, my parent or legal guardian has reviewed and approved this consent on my behalf.',
+      },
+      {
+        heading: 'Medical Information Sharing',
+        body: 'I consent to the sharing of relevant medical information — including pre-existing conditions, allergies, medications, and injury history — with coaching staff, team physiotherapists, and medical professionals involved in my care during the ITP. This information will be treated confidentially and used solely for the purpose of ensuring my health and safety. I agree to disclose all relevant medical conditions on my player registration form prior to the start of the trial or program.',
+      },
+      {
+        heading: 'Emergency Contact',
+        body: 'I confirm that the emergency contact information provided in my player registration is accurate and up to date. I understand that program staff will attempt to contact my designated emergency contact as soon as reasonably possible in the event of a medical emergency. I accept responsibility for ensuring my emergency contact is reachable during the duration of the trial or program and for notifying program staff immediately of any changes to this information.',
+      },
+    ],
+  },
   program_agreement: {
     title: 'ITP Program Agreement',
     phases: ['program'],
@@ -100,11 +118,11 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       },
       {
         heading: 'Medical & Insurance',
-        body: 'I confirm that I either (a) hold valid health and accident insurance covering my stay in Germany for the full program duration, or (b) am enrolled in the insurance coverage provided through the program. I will promptly disclose any injury, illness, or medical condition affecting my participation, and I will follow return-to-play protocols set by the program\'s medical staff or physiotherapists. Any medical costs not covered by my insurance remain my responsibility.',
+        body: 'For stays of one month or longer, Warubi Sports arranges health and accident insurance coverage for the full program duration. For stays shorter than one month, I am responsible for holding my own valid health and accident insurance covering my stay in Germany and will provide proof of coverage prior to the start of the program. I will promptly disclose any injury, illness, or medical condition affecting my participation, and I will follow return-to-play protocols set by the program\'s medical staff or physiotherapists. Any medical costs not covered by the applicable insurance remain my responsibility.',
       },
       {
         heading: 'Acknowledgement',
-        body: 'I have read and understood this Program Agreement in its entirety, along with the separate Liability Waiver, Code of Conduct, Media Consent, and Housing Living Agreement that I am also signing. I am committing voluntarily and with full understanding of the financial, physical, and time commitments involved. If I am under 18, my parent or legal guardian has reviewed and approved this agreement on my behalf.',
+        body: 'I have read and understood this Program Agreement in its entirety, along with the separate Liability Waiver, Code of Conduct, Media Consent, Medical Treatment Consent, and Housing Living Agreement that I am also signing. I am committing voluntarily and with full understanding of the financial, physical, and time commitments involved. If I am under 18, my parent or legal guardian has reviewed and approved this agreement on my behalf.',
       },
     ],
   },
