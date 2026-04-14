@@ -33,12 +33,19 @@ export default async function PlayerLayout({ params, children }: Props) {
   }
 
   const isAlumni = source === "player" && player.status === "alumni";
+  const isClosed = source === "prospect" && ["rejected", "withdrawn"].includes(player.status || "");
 
-  // Label differs per phase: alumni are finished, not active.
-  const labelPrefix = isAlumni ? "Alumni" : source === "player" ? "Program" : "Trial";
+  // Label differs per phase: alumni / closed are finished, not active.
+  const labelPrefix = isAlumni
+    ? "Alumni"
+    : isClosed
+      ? "Closed"
+      : source === "player"
+        ? "Program"
+        : "Trial";
 
   // Show onboarding tab: for prospects based on status, for active players.
-  // Alumni see no tabs — just their Info (alumni view) page.
+  // Alumni + closed see no tabs — just their Info page.
   const showOnboarding =
     source === "player"
       ? true
@@ -49,7 +56,7 @@ export default async function PlayerLayout({ params, children }: Props) {
     <div className="min-h-screen flex flex-col items-center">
       <main className="w-full max-w-[540px] min-h-screen lg:min-h-0 lg:my-8 lg:rounded-2xl lg:border lg:border-[var(--color-border)] lg:shadow-2xl lg:shadow-black/40 lg:overflow-hidden">
         <WelcomeHeader player={player} scoutInfo={scoutInfo} labelPrefix={labelPrefix} />
-        {isAlumni ? null : source === "player" ? (
+        {isAlumni || isClosed ? null : source === "player" ? (
           <TabNav playerId={playerId} variant="program" />
         ) : showOnboarding ? (
           <TabNav playerId={playerId} variant="prospect" completed={!!player.onboarding_completed_at} />

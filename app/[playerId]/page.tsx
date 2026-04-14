@@ -10,6 +10,7 @@ import { PaymentSection } from "@/components/PaymentSection";
 import { ProgramView } from "@/components/views/ProgramView";
 import { CommittedView } from "@/components/views/CommittedView";
 import { AlumniView } from "@/components/views/AlumniView";
+import { ClosedView } from "@/components/views/ClosedView";
 import { resolvePlayer, derivePhase } from "@/lib/resolvePlayer";
 import { sortContacts, STAFF_LOCATION_NAMES } from "@/lib/sortContacts";
 import { notFound } from "next/navigation";
@@ -44,6 +45,13 @@ export default async function PlayerPage({ params }: Props) {
 
   if (phase === "committed") {
     return <CommittedView prospect={resolved.raw as TrialProspect} />;
+  }
+
+  // Rejected / withdrawn prospects — show a farewell view instead of a
+  // stale trial page with a past schedule and orphaned signing UI.
+  const trialStatus = (resolved.raw as { status?: string }).status;
+  if (trialStatus === "rejected" || trialStatus === "withdrawn") {
+    return <ClosedView player={resolved.data} reason={trialStatus} />;
   }
 
   // Below: trial phase — existing trial prospect flow, unchanged.

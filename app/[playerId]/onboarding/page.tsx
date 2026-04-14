@@ -22,6 +22,11 @@ export default async function OnboardingPage({ params }: Props) {
 
   const player = resolved.raw as TrialProspect;
 
+  // Rejected / withdrawn — no onboarding flow, send to the ClosedView.
+  if (player.status === "rejected" || player.status === "withdrawn") {
+    redirect(`/${playerId}`);
+  }
+
   // Allow onboarding for scheduled, accepted, and placed players
   if (!['scheduled', 'accepted', 'placed'].includes(player.status) && !player.onboarding_completed_at) {
     notFound();
