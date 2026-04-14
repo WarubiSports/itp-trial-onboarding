@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, ClipboardCheck, Activity, Home } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Activity, Home, ShoppingCart } from "lucide-react";
 
 type Variant = "prospect" | "program";
 
@@ -27,7 +27,10 @@ export const TabNav = ({ playerId, variant = "prospect", completed = false }: Ta
             label: "Info",
             href: `/${playerId}`,
             icon: CalendarDays,
-            active: !pathname.includes("/wellness") && !pathname.includes("/chores"),
+            active:
+              !pathname.includes("/wellness") &&
+              !pathname.includes("/chores") &&
+              !pathname.includes("/grocery"),
           },
           {
             label: "Wellness",
@@ -40,6 +43,12 @@ export const TabNav = ({ playerId, variant = "prospect", completed = false }: Ta
             href: `/${playerId}/chores`,
             icon: Home,
             active: pathname.includes("/chores"),
+          },
+          {
+            label: "Grocery",
+            href: `/${playerId}/grocery`,
+            icon: ShoppingCart,
+            active: pathname.includes("/grocery"),
           },
         ]
       : [
