@@ -59,6 +59,30 @@ export default async function GroceryPage({ params }: Props) {
 
   const playerId = resolved.data.id;
 
+  // Gate on program start — pending players shouldn't be able to place
+  // orders for delivery dates before they've arrived. Without this gate,
+  // a 26/27 pending player could submit a phantom order for a current-season
+  // Tue/Fri delivery slot that the kitchen would receive.
+  const programStart = resolved.data.start_date;
+  if (programStart) {
+    const today = new Date().toISOString().split("T")[0];
+    if (today < programStart) {
+      const formatted = new Date(programStart + "T00:00:00").toLocaleDateString(
+        "en-US",
+        { month: "long", day: "numeric", year: "numeric" }
+      );
+      return (
+        <div className="py-12 px-4 text-center">
+          <CalendarClock size={40} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
+          <p className="text-[var(--color-text-secondary)] text-sm">
+            Available when your program begins on{" "}
+            <span className="font-semibold text-[var(--color-text)]">{formatted}</span>
+          </p>
+        </div>
+      );
+    }
+  }
+
   // Catalog — in-stock items
   const { data: catalogData } = await supabase
     .from("grocery_items")

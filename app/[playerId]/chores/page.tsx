@@ -62,6 +62,28 @@ export default async function ChoresPage({ params }: Props) {
   const playerId = resolved.data.id;
   const houseId = (resolved.raw as { house_id?: string | null }).house_id ?? null;
 
+  // Gate on program start — pending players (26/27 cohort) shouldn't see
+  // the current cohort's chores + leaderboard before they've arrived.
+  const programStart = resolved.data.start_date;
+  if (programStart) {
+    const today = new Date().toISOString().split("T")[0];
+    if (today < programStart) {
+      const formatted = new Date(programStart + "T00:00:00").toLocaleDateString(
+        "en-US",
+        { month: "long", day: "numeric", year: "numeric" }
+      );
+      return (
+        <div className="py-12 px-4 text-center">
+          <CalendarClock size={40} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
+          <p className="text-[var(--color-text-secondary)] text-sm">
+            Available when your program begins on{" "}
+            <span className="font-semibold text-[var(--color-text)]">{formatted}</span>
+          </p>
+        </div>
+      );
+    }
+  }
+
   // Player's chores
   const { data: choreData } = await supabase
     .from("chores")

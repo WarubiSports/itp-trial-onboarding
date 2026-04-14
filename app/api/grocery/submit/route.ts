@@ -19,6 +19,25 @@ export async function POST(request: Request) {
     );
   }
 
+  // Defense-in-depth — the UI gates pre-program-start players out of the
+  // grocery page, but a bookmarked POST could otherwise sneak through and
+  // put a phantom order in the kitchen's pipeline.
+  const { data: player } = await supabase
+    .from("players")
+    .select("program_start_date")
+    .eq("id", player_id)
+    .maybeSingle();
+
+  if (player?.program_start_date) {
+    const today = new Date().toISOString().split("T")[0];
+    if (today < player.program_start_date) {
+      return NextResponse.json(
+        { error: "Grocery ordering opens when your program begins." },
+        { status: 403 }
+      );
+    }
+  }
+
   // Enforce "one active order per player" (keeps parity with the Vite app's
   // "keep 1 per player" rule). Cancel any existing active orders first —
   // safer than blocking because the player clearly intended the new one.
