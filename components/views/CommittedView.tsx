@@ -153,7 +153,12 @@ export const CommittedView = async ({ prospect }: Props) => {
       </section>
 
       {/* Signing status — includes program-only docs (Program Agreement, Housing) on top of the trial 3 */}
-      <DocumentStatus signedDocs={signedDocs} playerId={playerId} phase="program" />
+      <DocumentStatus
+        signedDocs={signedDocs}
+        playerId={playerId}
+        phase="program"
+        trialStartDate={prospect.trial_start_date}
+      />
 
       {/* Payment */}
       <PaymentSection

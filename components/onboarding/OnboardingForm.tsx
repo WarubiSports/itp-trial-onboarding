@@ -51,7 +51,7 @@ export const OnboardingForm = ({ prospect, isUnder18, phase }: Props) => {
   // Documents shown in the signing step depend on the phase:
   // trial players sign the 3 core docs; program (committed) players
   // additionally sign the Program Agreement and Housing Living Agreement.
-  const REQUIRED_DOCS = getDocumentsForPhase(phase);
+  const REQUIRED_DOCS = getDocumentsForPhase(phase, prospect.trial_start_date);
   // Trial: Sign + Travel + Equipment + Confirm (4 steps, U18 adds no extra step since no legal forms for trials)
   // Program: Sign + Travel + Equipment + Documents [+ U18 Forms if minor] + Confirm
   const totalSteps = phase === "trial" ? 4 : isUnder18 ? 6 : 5;

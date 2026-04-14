@@ -4,6 +4,12 @@ export type DocumentDefinition = {
   title: string;
   /** Which player-journey phases require this document. */
   phases: DocumentPhase[];
+  /**
+   * Optional cutoff: only required for players whose trial starts on or
+   * after this date (YYYY-MM-DD). Lets us add new required docs without
+   * disrupting in-flight signings. Omit to require from all players.
+   */
+  effectiveFrom?: string;
   sections: { heading: string; body: string }[];
 };
 
@@ -77,6 +83,12 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
   medical_consent: {
     title: 'Medical Treatment Consent',
     phases: ['trial', 'program'],
+    // Added 2026-04-14 after porting from the women's app. Only required
+    // for players whose trial starts on or after the cutoff so in-flight
+    // prospects (Jadon: Apr 16, etc.) aren't surprised by a new doc
+    // mid-journey. Drop this field once all pre-cutoff prospects have
+    // cleared their trials and been placed.
+    effectiveFrom: '2026-04-23',
     sections: [
       {
         heading: 'Consent to Treatment',
@@ -161,9 +173,28 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
 /**
  * Returns the required documents for a given player-journey phase,
  * preserving definition order (which is also the display/signing order).
+ *
+ * Pass the player's `trial_start_date` as `referenceDate` to respect any
+ * doc's `effectiveFrom` cutoff. Prospects whose trials were scheduled
+ * before a doc's cutoff are exempt from signing it. Omit `referenceDate`
+ * to ignore cutoffs (e.g. in staff-side preview contexts).
  */
-export function getDocumentsForPhase(phase: DocumentPhase): { type: string; title: string }[] {
+export function getDocumentsForPhase(
+  phase: DocumentPhase,
+  referenceDate?: string | null
+): { type: string; title: string }[] {
   return Object.entries(DOCUMENT_CONTENT)
-    .filter(([, doc]) => doc.phases.includes(phase))
+    .filter(([, doc]) => {
+      if (!doc.phases.includes(phase)) return false;
+      if (doc.effectiveFrom && referenceDate !== undefined) {
+        // Unknown trial date (null) is treated as pre-cutoff — protects
+        // existing committed prospects whose trials weren't formally
+        // recorded from seeing a new doc appear mid-flight.
+        if (!referenceDate || referenceDate < doc.effectiveFrom) {
+          return false;
+        }
+      }
+      return true;
+    })
     .map(([type, doc]) => ({ type, title: doc.title }));
 }
