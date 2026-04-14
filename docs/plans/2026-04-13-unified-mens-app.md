@@ -78,9 +78,17 @@ Each feature: port → deploy → announce → monitor 48h → move on.
 - [ ] Monitor logs 48h for missed redirects
 - [ ] Keep Vite app live, deployed, rollback-ready for 30 days
 
-### Phase 5 — Multi-tenant merge (future)
+### Phase 5 — Vite sunset + multi-tenant merge (future)
 
-Once Men's app is stable for 60 days:
+**Sunset prep (shipped 2026-04-14):**
+- [x] Staff App sidebar: "Player App" generic button removed
+- [x] Vite app: sunset banner on every page pointing users to Thomas on WhatsApp
+- [ ] Set the hard sunset date — suggested: **2026-06-30** (one week before preseason)
+- [ ] Between now and sunset date, migrate the ~5 active Vite users off by hand
+- [ ] On sunset date: replace Vite app routes with a single redirect page ("Use your new portal — ask Thomas")
+- [ ] +30 days: take the Vite Vercel project offline
+
+**Multi-tenant merge (after Men's app stable for 60 days):**
 - [ ] Move `itp-men-app` + `itp-women-app` into one repo
 - [ ] Route by `program` field
 - [ ] Shared design system package
@@ -124,3 +132,5 @@ _Updated as phases complete._
 - 2026-04-13: **Phase 3.3 (Grocery) complete.** `/[playerId]/grocery` route with full cart UX: 8 category filter pills, 51 items with inline +/- quantity controls, sticky bottom bar showing budget progress and delivery date picker (next 4 Tue/Fri with 8 AM Berlin deadlines). POST /api/grocery/submit validates server-side (in-stock check, ≥1 qty, budget enforcement, price snapshot on order_items). Active order view replaces the cart when a pending/submitted order exists; new submissions auto-cancel prior active orders. `lib/groceryDeliveryDates.ts` ports Vite's delivery schedule. TabNav now: Info / Wellness / Chores / Grocery.
 - 2026-04-13: **Phase 3.4 (Goals + Drills + Focus notes) deferred.** Production check showed 0 focus notes, 0 drill completions, 1 goal. Porting UI for unused features is premature. Will revisit once there's actual demand.
 - 2026-04-13: **Phase 4 (Welcome email cutover) complete.** Staff App's `sendWelcomeEmail` now sends newly-promoted players to the unified portal (`itp-portal.vercel.app/<prospect_id || id>`) instead of the Vite Player App magic-link. Magic-link auth flow removed — unified portal uses UUID-based access with service-role writes, no password needed. Onboarding CTA is gated on the linked prospect's actual onboarding state rather than an email lookup. Vite app remains live as a fallback for existing users; all new acceptances go to the unified portal. **This is the cutover moment — every new accepted player experiences the unified app from here on.**
+- 2026-04-14: **Post-cutover polish.** Phase-aware signing (Program Agreement + Housing Living Agreement added for committed players; trial still 3 docs). Alumni view handles `players.status='alumni'` with a thank-you + contacts page; tabs hidden for alumni; wellness/chores/grocery routes redirect alumni to Info. Preseason date extracted to `lib/programCalendar.ts` (single source of truth). Welcome email's "same one from your trial" line is now conditional on `prospect_id` so direct-to-player creations don't lie. Staff App prospect + player detail pages both expose a "View as Player" button opening the unified portal URL.
+- 2026-04-14: **Phase 5 sunset prep.** Staff App sidebar's generic "Player App" button removed (staff now use per-player "View as Player"). Vite Player App shows a dismissible banner on every page: "This app is being replaced. Ask Thomas for your new link" with a WhatsApp deep-link. Actual sunset date not yet set — proposed 2026-06-30, one week before preseason.
