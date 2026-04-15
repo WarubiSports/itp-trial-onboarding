@@ -27,24 +27,7 @@ export const WelcomeHeader = ({ player, scoutInfo, labelPrefix = "Trial" }: Welc
   const initials = getInitials(player.first_name, player.last_name);
 
   return (
-    <div className="relative overflow-hidden">
-      {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-brand)] via-[#8B1118] to-[var(--color-bg)]" />
-
-      {/* Diagonal stripe pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage: `repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 10px,
-            rgba(255,255,255,0.1) 10px,
-            rgba(255,255,255,0.1) 12px
-          )`,
-        }}
-      />
-
+    <div className="relative overflow-hidden bg-[var(--color-brand)]">
       {/* Content */}
       <div className="relative px-5 pt-8 pb-8">
         {/* Co-branded logo lockup — Warubi left, title center, FC Köln right */}
@@ -101,9 +84,6 @@ export const WelcomeHeader = ({ player, scoutInfo, labelPrefix = "Trial" }: Welc
           </div>
         </div>
       </div>
-
-      {/* Bottom fade into page bg */}
-      <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[var(--color-bg)] to-transparent" />
     </div>
   );
 };
