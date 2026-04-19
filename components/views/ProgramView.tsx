@@ -31,6 +31,7 @@ export const ProgramView = async ({ player }: Props) => {
       .gte("date", startDate)
       .lte("date", endDate)
       .or("program.is.null,program.eq.itp_men")
+      .is("visitor_id", null)
       .not("type", "in", "(trial,prospect_trial,language_class,recovery,airport_pickup)")
       .order("date")
       .order("start_time");
