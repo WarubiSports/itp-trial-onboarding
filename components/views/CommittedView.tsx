@@ -27,6 +27,7 @@ type Props = {
  */
 export const CommittedView = async ({ prospect }: Props) => {
   const playerId = prospect.id;
+  const isFutures = (prospect as { program?: string }).program === "warubi_futures";
 
   // Signed documents — should be complete from trial, but verify.
   const { data: signedDocsData } = await supabase
@@ -41,17 +42,43 @@ export const CommittedView = async ({ prospect }: Props) => {
     signer_name: string;
   }[];
 
-  // Locations for Köln — exclude staff-only working locations
-  const { data: locationsData } = await supabase
-    .from("itp_locations")
-    .select("*")
-    .eq("itp_site", "Köln")
-    .not("name", "in", `(${STAFF_LOCATION_NAMES.map((n) => `"${n}"`).join(",")})`);
+  // Futures players see only their training venue (and housing if arranged).
+  // The wider ITP venue list isn't relevant to a 10-day intake.
+  let locations: ITPLocation[];
+  if (isFutures) {
+    const futTraining: ITPLocation = {
+      id: 'fut-training',
+      name: 'SV Lövenich/Widdersdorf 1986/27 e.V.',
+      address: 'Neue Sandkaul 21, 50859 Köln',
+      maps_url: 'https://www.google.com/maps/search/?api=1&query=SV+L%C3%B6venich+Widdersdorf+Neue+Sandkaul+21+50859+K%C3%B6ln',
+      category: 'training',
+      itp_site: 'Köln',
+    } as ITPLocation;
+    const housingArranged = prospect.accommodation_type === 'housing_provided';
+    locations = housingArranged
+      ? [
+          futTraining,
+          {
+            id: 'fut-housing',
+            name: 'Player House',
+            address: 'Neue Sandkaul 84, 50859 Köln-Widdersdorf',
+            maps_url: 'https://www.google.com/maps/search/?api=1&query=Neue+Sandkaul+84+50859+K%C3%B6ln',
+            category: 'housing',
+            itp_site: 'Köln',
+          } as ITPLocation,
+        ]
+      : [futTraining];
+  } else {
+    const { data: locationsData } = await supabase
+      .from("itp_locations")
+      .select("*")
+      .eq("itp_site", "Köln")
+      .not("name", "in", `(${STAFF_LOCATION_NAMES.map((n) => `"${n}"`).join(",")})`);
+    locations = (locationsData || []) as ITPLocation[];
+  }
 
-  let locations = (locationsData || []) as ITPLocation[];
-
-  // Override housing based on room assignment, else show TBC
-  if (prospect.room_id) {
+  // Override housing based on room assignment (ITP only — Futures resolved above).
+  if (!isFutures && prospect.room_id) {
     const { data: roomData } = await supabase
       .from("rooms")
       .select("name, house_id")
@@ -76,7 +103,7 @@ export const CommittedView = async ({ prospect }: Props) => {
         );
       }
     }
-  } else {
+  } else if (!isFutures) {
     locations = locations.map((loc) =>
       loc.category === "housing"
         ? {
@@ -145,10 +172,14 @@ export const CommittedView = async ({ prospect }: Props) => {
       <section className="px-4 pt-2 pb-4">
         <div className="rounded-xl border border-green-700/30 bg-green-900/20 p-4">
           <p className="text-sm font-semibold text-green-300">
-            You&apos;re in. Welcome to the ITP.
+            {isFutures ? "You're in. Welcome to Warubi Futures." : "You're in. Welcome to the ITP."}
           </p>
           <p className="text-sm text-green-300/80 mt-1">
-            Here&apos;s what&apos;s left to complete before preseason on {formatPreseasonStart()}.
+            {isFutures
+              ? prospect.trial_start_date
+                ? `Here's what's left to complete before your intake on ${new Date(prospect.trial_start_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.`
+                : "Here's what's left to complete before your intake."
+              : `Here's what's left to complete before preseason on ${formatPreseasonStart()}.`}
           </p>
         </div>
       </section>

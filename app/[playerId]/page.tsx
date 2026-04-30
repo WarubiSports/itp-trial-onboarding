@@ -71,16 +71,46 @@ export default async function PlayerPage({ params }: Props) {
     events = await getPlayerEvents({ startDate, endDate, phase: "trial", program: playerProgram });
   }
 
-  const { data: locationsData } = await supabase
-    .from("itp_locations")
-    .select("*")
-    .eq("itp_site", "Köln")
-    .not("name", "in", `(${STAFF_LOCATION_NAMES.map((n) => `"${n}"`).join(",")})`);
+  // Futures players see only their training venue (and housing if arranged
+   // for them). The wider ITP location set (FC Köln Office, BluePIT, Spoho)
+   // is irrelevant to a 10-day intake.
+  let locations: ITPLocation[];
+  if (isFutures) {
+    const futTraining: ITPLocation = {
+      id: 'fut-training',
+      name: 'SV Lövenich/Widdersdorf 1986/27 e.V.',
+      address: 'Neue Sandkaul 21, 50859 Köln',
+      maps_url: 'https://www.google.com/maps/search/?api=1&query=SV+L%C3%B6venich+Widdersdorf+Neue+Sandkaul+21+50859+K%C3%B6ln',
+      category: 'training',
+      itp_site: 'Köln',
+    } as ITPLocation;
+    const housingArranged = player.accommodation_type === 'housing_provided';
+    locations = housingArranged
+      ? [
+          futTraining,
+          {
+            id: 'fut-housing',
+            name: 'Player House',
+            address: 'Neue Sandkaul 84, 50859 Köln-Widdersdorf',
+            maps_url: 'https://www.google.com/maps/search/?api=1&query=Neue+Sandkaul+84+50859+K%C3%B6ln',
+            category: 'housing',
+            itp_site: 'Köln',
+          } as ITPLocation,
+        ]
+      : [futTraining];
+  } else {
+    const { data: locationsData } = await supabase
+      .from("itp_locations")
+      .select("*")
+      .eq("itp_site", "Köln")
+      .not("name", "in", `(${STAFF_LOCATION_NAMES.map((n) => `"${n}"`).join(",")})`);
 
-  let locations = (locationsData || []) as ITPLocation[];
+    locations = (locationsData || []) as ITPLocation[];
+  }
 
-  // Override housing location based on room assignment
-  if (player.room_id) {
+  // Override housing location based on room assignment (ITP only — Futures
+  // already resolved above and doesn't use the rooms/houses tables).
+  if (!isFutures && player.room_id) {
     const { data: roomData } = await supabase
       .from("rooms")
       .select("name, house_id")
@@ -132,8 +162,8 @@ export default async function PlayerPage({ params }: Props) {
     nationality: c.nationality,
   }));
 
-  // Update housing location card for unassigned players
-  if (!player.room_id) {
+  // Update housing location card for unassigned ITP players (FUT handled above).
+  if (!isFutures && !player.room_id) {
     const isHotelSuggested = player.accommodation_type === "hotel";
     locations = locations.map((loc) =>
       loc.category === "housing"
