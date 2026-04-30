@@ -31,6 +31,10 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
         body: 'For stays of one month or longer, Warubi Sports arranges health and accident insurance coverage for the full duration of the trial. For stays shorter than one month, I am responsible for holding my own valid health and accident insurance covering my stay in Germany and will provide proof of coverage prior to the start of the trial. In either case, I understand that I am responsible for any medical costs not covered by the applicable insurance.',
       },
       {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Liability Waiver is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this waiver shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law. If any provision of this waiver is held unenforceable, the remaining provisions remain in full effect.',
+      },
+      {
         heading: 'Acknowledgement',
         body: 'I confirm that I have read and understood this Liability Waiver in its entirety. I am signing this document voluntarily and with full knowledge of the risks involved. If I am under 18 years of age, my parent or legal guardian has also reviewed and approved this waiver on my behalf.',
       },
@@ -60,6 +64,10 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
         heading: 'Consequences',
         body: 'Violations of this Code of Conduct will be addressed on a case-by-case basis. Consequences may include a verbal or written warning, temporary suspension from training or matches, or immediate dismissal from the trial. Serious violations — including illegal activity, violence, or substance abuse — may result in immediate termination and early return home at the player\'s own expense. All decisions by program management are final.',
       },
+      {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Code of Conduct is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this Code shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law.',
+      },
     ],
   },
   media_consent: {
@@ -77,6 +85,10 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       {
         heading: 'Duration & Withdrawal',
         body: 'This consent is valid for the duration of the trial and for a period of 5 years following its conclusion. I may withdraw my consent at any time by submitting a written request to Warubi Sports at info@warubi-sports.com. Upon withdrawal, reasonable efforts will be made to remove my likeness from future publications, though materials already in circulation cannot be recalled. Withdrawal of consent does not affect the lawfulness of media use prior to the withdrawal.',
+      },
+      {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Media & Photo Consent is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this consent shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law.',
       },
     ],
   },
@@ -103,6 +115,10 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       {
         heading: 'Emergency Contact',
         body: 'I confirm that the emergency contact information provided in my player registration is accurate and up to date. I understand that program staff will attempt to contact my designated emergency contact as soon as reasonably possible in the event of a medical emergency. I accept responsibility for ensuring my emergency contact is reachable during the duration of the trial or program and for notifying program staff immediately of any changes to this information.',
+      },
+      {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Medical Treatment Consent is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this consent shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law.',
       },
     ],
   },
@@ -131,8 +147,16 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
         body: 'I commit to giving my full effort to every training session, match, and testing day. I will follow instructions from coaching and program staff, train at the intensity and focus expected, and respect the group environment. I understand that performance, attitude, and off-pitch conduct are all evaluated throughout the program, and that future pathway opportunities — college placement, professional trial referrals, continued ITP enrollment — depend on all three. I will engage openly with the development process: accepting feedback, working on identified areas of growth, and communicating with staff about my progress.',
       },
       {
+        heading: 'Financial Terms & Cancellation',
+        body: 'Program fees, payment schedule, deposit terms, and cancellation/withdrawal consequences are set out in my separate Placement Agreement with Warubi Sports. The Placement Agreement is incorporated into this Program Agreement by reference and forms part of my overall commitment to the program. In the event of any inconsistency between this Program Agreement and the Placement Agreement on financial matters, the Placement Agreement controls.',
+      },
+      {
         heading: 'Medical & Insurance',
         body: 'For stays of one month or longer, Warubi Sports arranges health and accident insurance coverage for the full program duration. For stays shorter than one month, I am responsible for holding my own valid health and accident insurance covering my stay in Germany and will provide proof of coverage prior to the start of the program. I will promptly disclose any injury, illness, or medical condition affecting my participation, and I will follow return-to-play protocols set by the program\'s medical staff or physiotherapists. Any medical costs not covered by the applicable insurance remain my responsibility.',
+      },
+      {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Program Agreement is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this agreement shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law. If any provision of this agreement is held unenforceable, the remaining provisions remain in full effect.',
       },
       {
         heading: 'Acknowledgement',
@@ -167,6 +191,10 @@ export const DOCUMENT_CONTENT: Record<string, DocumentDefinition> = {
       {
         heading: 'Move-Out & Inspection',
         body: 'At the end of my program, or upon withdrawal for any reason, I will vacate the housing within the timeframe set by program staff. Before departure, I will remove all personal belongings, clean my room and assigned common-area responsibilities, return program-issued keys and equipment, and complete an exit inspection with a staff member. Any items left behind after my departure date may be disposed of at the program\'s discretion. My deposit, minus any damage or outstanding fees, will be returned to the account I provide.',
+      },
+      {
+        heading: 'Governing Law & Jurisdiction',
+        body: 'This Housing Living Agreement is governed by the laws of the Federal Republic of Germany. Any dispute arising from or in connection with this agreement shall be brought before the competent courts of Cologne, North Rhine-Westphalia, to the extent permitted by mandatory consumer protection law.',
       },
     ],
   },

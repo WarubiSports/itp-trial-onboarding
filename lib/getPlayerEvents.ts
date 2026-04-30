@@ -2,11 +2,13 @@ import { supabase } from "./supabase";
 import type { CalendarEvent } from "./types";
 
 type Phase = "trial" | "program";
+type Program = "itp_men" | "itp_women" | "warubi_futures";
 
 type Args = {
   startDate: string;
   endDate: string;
   phase: Phase;
+  program?: Program | null;
 };
 
 /**
@@ -21,7 +23,8 @@ type Args = {
  *   - visitor_id IS NULL    — excludes visitor itineraries (regression
  *                              fix Apr 2026: Junero's agent visit was
  *                              leaking onto Jadon's trial calendar)
- *   - program scope         — only generic events or itp_men
+ *   - program scope         — generic (NULL) events plus the player's own
+ *                              program (itp_men, itp_women, or warubi_futures)
  *   - type exclusions       — language class, recovery, airport pickup
  *                              are never shown; program phase also
  *                              excludes trial-only event types
@@ -33,6 +36,7 @@ export async function getPlayerEvents({
   startDate,
   endDate,
   phase,
+  program,
 }: Args): Promise<CalendarEvent[]> {
   const excludes = [
     "language_class",
@@ -41,6 +45,10 @@ export async function getPlayerEvents({
     ...(phase === "program" ? ["trial", "prospect_trial"] : []),
   ];
 
+  const programFilter = program
+    ? `program.is.null,program.eq.${program}`
+    : "program.is.null";
+
   const { data } = await supabase
     .from("events")
     .select("*")
@@ -48,7 +56,7 @@ export async function getPlayerEvents({
     .lte("date", endDate)
     .not("type", "in", `(${excludes.join(",")})`)
     .is("visitor_id", null)
-    .or("program.is.null,program.eq.itp_men")
+    .or(programFilter)
     .order("date")
     .order("start_time");
 

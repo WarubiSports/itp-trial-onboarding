@@ -27,8 +27,12 @@ export default async function OnboardingPage({ params }: Props) {
     redirect(`/${playerId}`);
   }
 
-  // Allow onboarding for scheduled, accepted, and placed players
-  if (!['scheduled', 'accepted', 'placed'].includes(player.status) && !player.onboarding_completed_at) {
+  // Allow onboarding for scheduled, accepted, and placed players.
+  // Warubi Futures prospects skip the trial-status gate — auto-promotion lands
+  // them at status `requested`, but they're already paid/confirmed via the
+  // Futures admin flow, so onboarding should open immediately.
+  const isFutures = player.program === 'warubi_futures';
+  if (!isFutures && !['scheduled', 'accepted', 'placed'].includes(player.status) && !player.onboarding_completed_at) {
     notFound();
   }
 

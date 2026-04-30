@@ -26,7 +26,12 @@ export const ProgramView = async ({ player }: Props) => {
   // Schedule — only if program dates set
   let events: CalendarEvent[] = [];
   if (startDate && endDate) {
-    events = await getPlayerEvents({ startDate, endDate, phase: "program" });
+    events = await getPlayerEvents({
+      startDate,
+      endDate,
+      phase: "program",
+      program: player.program ?? null,
+    });
   }
 
   // Locations (Köln site) — exclude staff-only working locations

@@ -25,34 +25,39 @@ export const WelcomeHeader = ({ player, scoutInfo, labelPrefix = "Trial" }: Welc
       : null;
 
   const initials = getInitials(player.first_name, player.last_name);
+  const isFutures = (player as { program?: string }).program === "warubi_futures";
 
   return (
     <div className="relative overflow-hidden bg-[var(--color-brand)]">
       {/* Content */}
       <div className="relative px-5 pt-8 pb-8">
-        {/* Co-branded logo lockup — Warubi left, title center, FC Köln right */}
+        {/* Logo lockup. ITP: Warubi + FC Köln co-branded. Futures: Warubi only. */}
         <div className="flex items-center justify-between mb-6">
           <Image
-            src="/warubi-sports-logo.png"
-            alt="Warubi Sports"
-            width={90}
-            height={24}
+            src={isFutures ? "/warubi-signet.png" : "/warubi-sports-logo.png"}
+            alt={isFutures ? "Warubi" : "Warubi Sports"}
+            width={isFutures ? 32 : 90}
+            height={isFutures ? 32 : 24}
             priority
-            className="opacity-90 object-contain"
+            className="opacity-95 object-contain"
           />
           <div className="text-center">
             <p className="text-[9px] font-bold tracking-[3px] text-white/70 uppercase">
-              International Talent Pathway
+              {isFutures ? "Warubi Futures" : "International Talent Pathway"}
             </p>
           </div>
-          <Image
-            src="/fc-koln-crest.png"
-            alt="1. FC Köln"
-            width={36}
-            height={44}
-            priority
-            className="opacity-90 object-contain"
-          />
+          {isFutures ? (
+            <div className="w-9" aria-hidden />
+          ) : (
+            <Image
+              src="/fc-koln-crest.png"
+              alt="1. FC Köln"
+              width={36}
+              height={44}
+              priority
+              className="opacity-90 object-contain"
+            />
+          )}
         </div>
 
         {/* Red accent bar */}

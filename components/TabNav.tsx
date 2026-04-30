@@ -9,16 +9,21 @@ type Variant = "prospect" | "program";
 type TabNavProps = {
   playerId: string;
   variant?: Variant;
+  /** Used to gate residential-only tabs (Chores, Grocery) to ITP. Futures
+   *  intakes are 10-day evaluations with no self-managed housing. */
+  program?: "itp_men" | "itp_women" | "warubi_futures";
   /** Only used in `prospect` variant — shows a checkmark when onboarding is done. */
   completed?: boolean;
 };
 
 /**
  * Bottom navigation. Prospect variant has Info / Onboarding tabs.
- * Program variant has Info / Wellness for now — add Chores, Grocery, etc. as ported.
+ * Program variant has Info + Wellness + Testing always; Chores and Grocery
+ * are ITP-only (residential 9-month program features).
  */
-export const TabNav = ({ playerId, variant = "prospect", completed = false }: TabNavProps) => {
+export const TabNav = ({ playerId, variant = "prospect", program, completed = false }: TabNavProps) => {
   const pathname = usePathname();
+  const isFutures = program === "warubi_futures";
 
   const tabs =
     variant === "program"
@@ -39,18 +44,22 @@ export const TabNav = ({ playerId, variant = "prospect", completed = false }: Ta
             icon: Activity,
             active: pathname.includes("/wellness"),
           },
-          {
-            label: "Chores",
-            href: `/${playerId}/chores`,
-            icon: Home,
-            active: pathname.includes("/chores"),
-          },
-          {
-            label: "Grocery",
-            href: `/${playerId}/grocery`,
-            icon: ShoppingCart,
-            active: pathname.includes("/grocery"),
-          },
+          ...(isFutures
+            ? []
+            : [
+                {
+                  label: "Chores",
+                  href: `/${playerId}/chores`,
+                  icon: Home,
+                  active: pathname.includes("/chores"),
+                },
+                {
+                  label: "Grocery",
+                  href: `/${playerId}/grocery`,
+                  icon: ShoppingCart,
+                  active: pathname.includes("/grocery"),
+                },
+              ]),
           {
             label: "Testing",
             href: `/${playerId}/testing`,

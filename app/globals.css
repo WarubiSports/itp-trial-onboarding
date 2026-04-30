@@ -13,6 +13,21 @@
   --color-text-muted: #64748B;
 }
 
+/* Warubi Futures theme — mirrors futures.warubi-sports.com palette.
+   Applied via data-program on the player layout root. */
+[data-program="warubi_futures"] {
+  --color-brand: #7C6EAD;
+  --color-brand-dark: #6B5D9C;
+  --color-brand-glow: rgba(124, 110, 173, 0.25);
+  --color-bg: #0D0818;
+  --color-surface: #160F2A;
+  --color-surface-elevated: #1A1230;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text: #FFFFFF;
+  --color-text-secondary: #A99CC9;
+  --color-text-muted: #6F6485;
+}
+
 html {
   scroll-behavior: smooth;
   color-scheme: dark;

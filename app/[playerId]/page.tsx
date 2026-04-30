@@ -61,10 +61,14 @@ export default async function PlayerPage({ params }: Props) {
   const player = prospect as TrialProspect;
   const startDate = player.trial_start_date;
   const endDate = player.trial_end_date;
+  const playerProgram = resolved.data.program ?? null;
+  const isFutures = playerProgram === "warubi_futures";
+  const programLabel = isFutures ? "Warubi Futures" : "1.FC Köln ITP";
+  const periodWord = isFutures ? "intake" : "trial";
 
   let events: CalendarEvent[] = [];
   if (startDate && endDate) {
-    events = await getPlayerEvents({ startDate, endDate, phase: "trial" });
+    events = await getPlayerEvents({ startDate, endDate, phase: "trial", program: playerProgram });
   }
 
   const { data: locationsData } = await supabase
@@ -254,7 +258,7 @@ export default async function PlayerPage({ params }: Props) {
 
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/491602717912?text=${encodeURIComponent(`Hi Thomas, I'm ${player.first_name} ${player.last_name} and I'm coming for a trial at the 1.FC Köln ITP. I have a question:`)}`}
+              href={`https://wa.me/491602717912?text=${encodeURIComponent(`Hi Thomas, I'm ${player.first_name} ${player.last_name} and I'm coming for a ${periodWord} at the ${programLabel}. I have a question:`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-4 transition-colors active:bg-[var(--color-surface-elevated)]"
