@@ -163,21 +163,32 @@ export default async function PlayerPage({ params }: Props) {
   }));
 
   // Update housing location card for unassigned ITP players (FUT handled above).
+  // accommodation_type === 'house' means we're hosting them in academy housing,
+  // even before a specific room is assigned.
   if (!isFutures && !player.room_id) {
     const isHotelSuggested = player.accommodation_type === "hotel";
+    const isAcademyHosted = player.accommodation_type === "house";
     locations = locations.map((loc) =>
       loc.category === "housing"
         ? {
             ...loc,
-            name: isHotelSuggested ? "Nearby Hotel" : "Self-Organized",
-            address: isHotelSuggested
-              ? (player.accommodation_notes || "We recommend one of the hotels below — all within minutes of the training facility.")
-              : "No housing assigned yet — please organize your own accommodation.",
+            name: isAcademyHosted
+              ? "Player Housing — Widdersdorf"
+              : isHotelSuggested
+                ? "Nearby Hotel"
+                : "Self-Organized",
+            address: isAcademyHosted
+              ? (player.accommodation_notes || "You'll be staying in our player housing in Widdersdorf. Your specific house and room will be confirmed before arrival.")
+              : isHotelSuggested
+                ? (player.accommodation_notes || "We recommend one of the hotels below — all within minutes of the training facility.")
+                : "No housing assigned yet — please organize your own accommodation.",
             maps_url: null,
           }
         : loc
     );
   }
+
+  const academyHosted = !isFutures && (!!player.room_id || player.accommodation_type === "house");
 
   return (
     <>
@@ -327,6 +338,7 @@ export default async function PlayerPage({ params }: Props) {
         </section>
       )}
 
+      {!academyHosted && (
       <section className="px-4 pb-12">
         <h2 className={`mb-1 text-lg font-bold font-[family-name:var(--font-outfit)] ${player.accommodation_type === "hotel" ? "text-[var(--color-brand)]" : "text-[var(--color-text)]"}`}>
           {player.accommodation_type === "hotel" ? "Your Hotel Options" : "Recommended Hotels"}
@@ -356,6 +368,7 @@ export default async function PlayerPage({ params }: Props) {
           </div>
         </div>
       </section>
+      )}
     </>
   );
 }
