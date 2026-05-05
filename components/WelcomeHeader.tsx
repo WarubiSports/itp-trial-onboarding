@@ -25,7 +25,12 @@ export const WelcomeHeader = ({ player, scoutInfo, labelPrefix = "Trial" }: Welc
       : null;
 
   const initials = getInitials(player.first_name, player.last_name);
-  const isFutures = (player as { program?: string }).program === "warubi_futures";
+  // Female camp lives under warubi_futures (admin grouping) but is FC Köln
+  // co-branded on the player side. Treat male Futures only as the purple
+  // Warubi-only brand; female Futures keeps the ITP red + crest.
+  const program = (player as { program?: string }).program;
+  const gender = (player as { gender?: string }).gender;
+  const isFutures = program === "warubi_futures" && gender !== "female";
 
   return (
     <div className="relative overflow-hidden bg-[var(--color-brand)]">

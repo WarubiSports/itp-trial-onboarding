@@ -32,6 +32,7 @@ export type PlayerRecord = {
   payment_status?: string | null;
   date_of_birth: string;
   program?: "itp_men" | "itp_women" | "warubi_futures" | null;
+  gender?: "male" | "female" | null;
 };
 
 export type ResolvedPlayer =
@@ -133,6 +134,7 @@ function normalizePlayer(p: Record<string, unknown>): PlayerRecord {
     payment_status: (p.payment_status as string) || null,
     date_of_birth: (p.date_of_birth as string) || "",
     program: (p.program as PlayerRecord["program"]) ?? null,
+    gender: (p.gender as PlayerRecord["gender"]) ?? null,
   };
 }
 
@@ -164,5 +166,6 @@ function normalizeProspect(p: TrialProspect): PlayerRecord {
     payment_status: p.payment_status || null,
     date_of_birth: p.date_of_birth,
     program: (p as { program?: PlayerRecord["program"] }).program ?? null,
+    gender: (p as { gender?: PlayerRecord["gender"] }).gender ?? null,
   };
 }
